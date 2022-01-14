@@ -1,3 +1,8 @@
+hat_updater
+.vscode
+
+# ------------------------ Pre-populated by GitHub template ------------------------
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

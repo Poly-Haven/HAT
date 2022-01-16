@@ -1,5 +1,13 @@
-from . import addon_updater_ops
+if "bpy" in locals():
+    import imp
+    imp.reload(addon_updater_ops)
+    imp.reload(ui)
+else:
+    from . import addon_updater_ops
+    from . import ui
+
 import bpy
+
 bl_info = {
     "name": "HAT: Haven Asset Tester",
     "description": "Internal quality control tool for polyhaven.com",
@@ -12,10 +20,6 @@ bl_info = {
     "tracker_url": "https://github.com/Poly-Haven/HAT/issues",
     "category": "Scene",
 }
-
-if "bpy" in locals():
-    import imp
-    imp.reload(addon_updater_ops)
 
 
 class HatPreferences(bpy.types.AddonPreferences):
@@ -61,7 +65,7 @@ class HatPreferences(bpy.types.AddonPreferences):
 
 classes = [
     HatPreferences,
-]
+] + ui.ui_classes
 
 
 def register():

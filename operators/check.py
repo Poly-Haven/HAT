@@ -42,6 +42,12 @@ def non_color_data(slug):
     return result, messages
 
 
+def unsaved():
+    if bpy.data.is_dirty:
+        return 'WARNING', ["File contains unsaved changes"]
+    return 'SUCCESS', []
+
+
 class HAT_OT_check(bpy.types.Operator):
     bl_idname = "hat.check"
     bl_label = "Check"
@@ -49,6 +55,10 @@ class HAT_OT_check(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     tests = []  # [["STATUS", [messages]]]
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.data.is_saved
 
     def draw(self, context):
         status_icon = {
@@ -63,8 +73,12 @@ class HAT_OT_check(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.tests = []  # Reset after rerun
+
         slug = bpy.path.display_name_from_filepath(bpy.data.filepath)
+
         self.tests.append(non_color_data(slug))
+        self.tests.append(unsaved())
+
         return context.window_manager.invoke_props_dialog(self, width=300 * dpi_factor.dpi_factor())
 
     def execute(self, context):

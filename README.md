@@ -19,4 +19,4 @@ Features:
 * [ ] Texture paths should all be relative
 * [ ] "Sphere" object is default dimensions
 * [ ] Slug naming convention
-* [ ] File has unsaved changes
+* [x] Warning if file has unsaved changes

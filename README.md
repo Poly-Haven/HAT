@@ -12,4 +12,10 @@ Features:
 * [ ] Unit Scale is 1.0
 * [ ] Warning if scale is not applied
 * [ ] Collection name should be same as slug (file name)
-* [ ] (textures) material should be the same as slug
+* [ ] Texture file names should start with slug
+* [ ] Texture datablock should match file name
+* [ ] Objects names should start with slug
+* [ ] Material names should start with slug
+* [ ] Texture paths should all be relative
+* [ ] "Sphere" object is default dimensions
+* [ ] Slug naming convention

@@ -3,7 +3,7 @@ Haven Asset Tester - A Blender add-on we use for asset QC
 
 Features:
 
-* [ ] Check maps use Non-color Data when required
+* [x] Check maps use Non-color Data when required
 * [ ] Test FBX export
 * [ ] Create GLTF button (fix common path issues automatically, and test)
 * [ ] Check if vertex colors exist (will screw up gltf export)
@@ -19,3 +19,4 @@ Features:
 * [ ] Texture paths should all be relative
 * [ ] "Sphere" object is default dimensions
 * [ ] Slug naming convention
+* [ ] File has unsaved changes

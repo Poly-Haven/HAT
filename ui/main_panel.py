@@ -1,5 +1,6 @@
 import bpy
 from .. import addon_updater_ops
+from ..operators import check
 
 
 class HAT_PT_main (bpy.types.Panel):
@@ -15,4 +16,7 @@ class HAT_PT_main (bpy.types.Panel):
 
         layout = self.layout
 
-        layout.label(text="Yes")
+        row = layout.row()
+        row.alignment = 'CENTER'
+        row.scale_y = 1.5
+        row.operator(check.HAT_OT_check.bl_idname, icon="CHECKMARK")

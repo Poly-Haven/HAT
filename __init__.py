@@ -2,9 +2,11 @@ if "bpy" in locals():
     import imp
     imp.reload(addon_updater_ops)
     imp.reload(ui)
+    imp.reload(operators)
 else:
     from . import addon_updater_ops
     from . import ui
+    from . import operators
 
 import bpy
 
@@ -65,7 +67,7 @@ class HatPreferences(bpy.types.AddonPreferences):
 
 classes = [
     HatPreferences,
-] + ui.ui_classes
+] + ui.classes + operators.classes
 
 
 def register():

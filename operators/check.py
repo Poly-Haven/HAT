@@ -50,7 +50,7 @@ def unsaved():
 
 class HAT_OT_check(bpy.types.Operator):
     bl_idname = "hat.check"
-    bl_label = "Check"
+    bl_label = "Test results:"
     bl_description = "Run all checks"
     bl_options = {'UNDO'}
 

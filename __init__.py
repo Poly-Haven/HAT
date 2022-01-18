@@ -3,10 +3,12 @@ if "bpy" in locals():
     imp.reload(addon_updater_ops)
     imp.reload(ui)
     imp.reload(operators)
+    imp.reload(icons)
 else:
     from . import addon_updater_ops
     from . import ui
     from . import operators
+    from . import icons
 
 import bpy
 
@@ -73,6 +75,8 @@ classes = [
 def register():
     addon_updater_ops.register(bl_info)
 
+    icons.previews_register()
+
     from bpy.utils import register_class
     for cls in classes:
         register_class(cls)
@@ -80,6 +84,8 @@ def register():
 
 def unregister():
     addon_updater_ops.unregister()
+
+    icons.previews_unregister()
 
     from bpy.utils import unregister_class
     for cls in reversed(classes):

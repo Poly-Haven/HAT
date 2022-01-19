@@ -1,51 +1,8 @@
 import bpy
 from ..utils import dpi_factor
-from ..utils import filename_utils
 
-
-def non_color_data(slug):
-    result = "SUCCESS"
-    messages = []
-
-    linear_types = [
-        "rough",
-        "metal",
-        "nor_gl",
-        "disp",
-    ]
-    aliases = {
-        'roughness': 'rough',
-        'metallic': 'metal',
-        'nor': 'nor_gl',
-        'norm': 'nor_gl',
-        'normal': 'nor_gl',
-        'normals': 'nor_gl',
-        'height': 'disp',
-        'displacement': 'disp',
-    }
-
-    for img in bpy.data.images:
-        if img.filepath:
-            map_name = filename_utils.get_map_name(img.filepath, slug)
-            if map_name in aliases:
-                map_name = aliases[map_name]
-
-            if map_name in linear_types:
-                if img.colorspace_settings.name != 'Non-Color':
-                    result = 'ERROR'
-                    messages.append(bpy.path.basename(
-                        img.filepath) + " isn't Non-Color")
-
-    if result == "SUCCESS":
-        messages = ["All data texture maps are Non-Color"]
-
-    return result, messages
-
-
-def unsaved():
-    if bpy.data.is_dirty:
-        return 'WARNING', ["File contains unsaved changes"]
-    return 'SUCCESS', []
+from .checks import non_color_data
+from .checks import unsaved
 
 
 class HAT_OT_check(bpy.types.Operator):
@@ -76,8 +33,8 @@ class HAT_OT_check(bpy.types.Operator):
 
         slug = bpy.path.display_name_from_filepath(bpy.data.filepath)
 
-        self.tests.append(non_color_data(slug))
-        self.tests.append(unsaved())
+        self.tests.append(non_color_data.check(slug))
+        self.tests.append(unsaved.check())
 
         return context.window_manager.invoke_props_dialog(self, width=300 * dpi_factor.dpi_factor())
 

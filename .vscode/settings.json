@@ -1,0 +1,8 @@
+{
+  "editor.tabSize": 4,
+  "python.formatting.autopep8Args": ["--ignore","E402"],
+  "files.exclude": {
+    "**/__pycache__": true,
+    "hat_updater": true
+  }
+}

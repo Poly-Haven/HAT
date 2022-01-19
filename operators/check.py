@@ -1,6 +1,6 @@
 import importlib
-import bpy
 import os
+import sys
 from ..utils import dpi_factor
 
 check_list = (os.path.splitext(f)[0] for f in os.listdir(
@@ -8,10 +8,14 @@ check_list = (os.path.splitext(f)[0] for f in os.listdir(
 
 checks = {}
 for c in check_list:
-    m = importlib.import_module('.' + c, 'HAT.operators.checks')
-    # TODO: Not great reloading immediately after import
-    importlib.reload(m)
+    if "bpy" not in locals():
+        m = importlib.import_module('.' + c, 'HAT.operators.checks')
+    else:
+        m = sys.modules['HAT.operators.checks.' + c]
+        importlib.reload(m)
     checks[c] = m
+
+import bpy
 
 
 class HAT_OT_check(bpy.types.Operator):

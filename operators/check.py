@@ -1,16 +1,23 @@
+import importlib
 import bpy
+import os
 from ..utils import dpi_factor
 
-from .checks import non_color_data
-from .checks import vert_cols
-from .checks import unsaved
+check_list = (os.path.splitext(f)[0] for f in os.listdir(
+    os.path.join(os.path.dirname(__file__), 'checks')) if f.endswith('.py'))
+
+checks = {}
+for c in check_list:
+    m = importlib.import_module('.' + c, 'HAT.operators.checks')
+    # TODO: Not great reloading immediately after import
+    importlib.reload(m)
+    checks[c] = m
 
 
 class HAT_OT_check(bpy.types.Operator):
     bl_idname = "hat.check"
     bl_label = "Test results:"
     bl_description = "Run all checks"
-    bl_options = {'UNDO'}
 
     tests = []  # [["STATUS", [messages]]]
 
@@ -35,9 +42,8 @@ class HAT_OT_check(bpy.types.Operator):
 
         slug = bpy.path.display_name_from_filepath(bpy.data.filepath)
 
-        self.tests.append(non_color_data.check(slug))
-        self.tests.append(vert_cols.check(slug))
-        self.tests.append(unsaved.check())
+        for c in checks.values():
+            self.tests.append(c.check(slug))
 
         return context.window_manager.invoke_props_dialog(self, width=300 * dpi_factor.dpi_factor())
 

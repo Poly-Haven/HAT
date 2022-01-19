@@ -18,6 +18,7 @@ class HAT_OT_check(bpy.types.Operator):
         return bpy.data.is_saved
 
     def draw(self, context):
+        # TODO: Use custom icons to make errors stand out.
         status_icon = {
             'ERROR': 'CANCEL',
             'WARNING': 'ERROR',  # Blender's "error" icon is a warning triangle...?

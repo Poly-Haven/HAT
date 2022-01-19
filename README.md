@@ -6,7 +6,7 @@ Haven Asset Tester - A Blender add-on we use for asset QC
 Checks:
 
 * [x] Check maps use Non-color Data when required
-* [ ] Check if vertex colors exist (will screw up gltf export)
+* [x] Check if vertex colors exist (will screw up gltf export)
 * [ ] Unit Scale is 1.0
 * [ ] Warning if scale is not applied
 * [ ] Collection name should be same as slug (file name)

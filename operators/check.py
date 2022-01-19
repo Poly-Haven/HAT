@@ -2,6 +2,7 @@ import bpy
 from ..utils import dpi_factor
 
 from .checks import non_color_data
+from .checks import vert_cols
 from .checks import unsaved
 
 
@@ -35,6 +36,7 @@ class HAT_OT_check(bpy.types.Operator):
         slug = bpy.path.display_name_from_filepath(bpy.data.filepath)
 
         self.tests.append(non_color_data.check(slug))
+        self.tests.append(vert_cols.check(slug))
         self.tests.append(unsaved.check())
 
         return context.window_manager.invoke_props_dialog(self, width=300 * dpi_factor.dpi_factor())

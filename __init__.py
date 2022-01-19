@@ -1,14 +1,14 @@
-if "bpy" in locals():
+if "bpy" not in locals():
+    from . import addon_updater_ops
+    from . import ui
+    from . import operators
+    from . import icons
+else:
     import imp
     imp.reload(addon_updater_ops)
     imp.reload(ui)
     imp.reload(operators)
     imp.reload(icons)
-else:
-    from . import addon_updater_ops
-    from . import ui
-    from . import operators
-    from . import icons
 
 import bpy
 

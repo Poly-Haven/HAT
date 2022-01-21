@@ -11,6 +11,7 @@ else:
     imp.reload(icons)
 
 import bpy
+from bpy.app.handlers import persistent
 
 bl_info = {
     "name": "HAT: Haven Asset Tester",
@@ -67,6 +68,15 @@ class HatPreferences(bpy.types.AddonPreferences):
         addon_updater_ops.update_settings_ui(self, context)
 
 
+@persistent
+def pre_save_handler(dummy):
+    '''Set shading mode to solid so that it's quicker to open next time.'''
+    for area in (a for a in bpy.context.screen.areas if a.type == 'VIEW_3D'):
+        for space in (s for s in area.spaces if s.type == 'VIEW_3D'):
+            if space.shading.type == 'MATERIAL':
+                space.shading.type = 'SOLID'
+
+
 classes = [
     HatPreferences,
 ] + ui.classes + operators.classes
@@ -81,9 +91,13 @@ def register():
     for cls in classes:
         register_class(cls)
 
+    bpy.app.handlers.save_pre.append(pre_save_handler)
+
 
 def unregister():
     addon_updater_ops.unregister()
+
+    bpy.app.handlers.save_pre.remove(pre_save_handler)
 
     icons.previews_unregister()
 

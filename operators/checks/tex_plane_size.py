@@ -20,6 +20,6 @@ def check(slug):
             if plane.dimensions == default_dimensions:
                 result = "QUESTION"
                 messages = [
-                    "Plane is default dimensions (2 meters), confirm this is accurate."]
+                    "Plane has default dimensions (2 meters), confirm this is accurate."]
 
     return result, messages

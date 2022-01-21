@@ -14,7 +14,7 @@ Checks:
 * [x] Texture datablock should match file name
 * [x] Material names should match or start with slug
 * [x] Texture paths should all be relative
-* [ ] "Sphere" object is default dimensions
+* [x] Texture "Plane" object is default dimensions
 * [ ] Slug naming convention
 * [x] Warning if file has unsaved changes
 

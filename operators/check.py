@@ -35,6 +35,7 @@ class HAT_OT_check(bpy.types.Operator):
         status_icon_custom = {
             'ERROR': 'x-circle-fill',
             'WARNING': 'exclamation-triangle',
+            'QUESTION': 'question',
         }
         status_icon = {
             'SUCCESS': 'CHECKMARK',

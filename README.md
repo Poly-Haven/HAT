@@ -10,7 +10,7 @@ Checks:
 * [x] Unit Scale is 1.0
 * [x] Warning if scale is not applied
 * [x] Collection name should be same as slug (file name)
-* [ ] Texture file names should start with slug
+* [x] Texture file names should start with slug
 * [ ] Texture datablock should match file name
 * [ ] Material names should start with slug
 * [ ] Texture paths should all be relative

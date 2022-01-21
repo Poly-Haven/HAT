@@ -648,7 +648,7 @@ def updater_run_install_popup_handler(scene):
     if "ignore" in updater.json and updater.json["ignore"] == True:
         return  # don't do popup if ignore pressed
     # elif type(updater.update_version) != type((0,0,0)):
-    # 	# likely was from master or another branch, shouldn't trigger popup
+    # 	# likely was from main or another branch, shouldn't trigger popup
     # 	updater.json_reset_restore()
     # 	return
     elif "version_text" in updater.json and "version" in updater.json["version_text"]:
@@ -1369,11 +1369,11 @@ def register(bl_info):
     # will ensure no old python files/caches remain in event different addon
     # versions have different filenames or structures
 
-    # Allow branches like 'master' as an option to update to, regardless
+    # Allow branches like 'main' as an option to update to, regardless
     # of release or version.
     # Default behavior: releases will still be used for auto check (popup),
     # but the user has the option from user preferences to directly
-    # update to the master branch or any other branches specified using
+    # update to the main branch or any other branches specified using
     # the "install {branch}/older version" operator.
     updater.include_branches = True
 
@@ -1388,10 +1388,10 @@ def register(bl_info):
     # just the tag name, bear this in mind given the skip_tag_function filtering above
 
     # if using "include_branches",
-    # updater.include_branch_list defaults to ['master'] branch if set to none
+    # updater.include_branch_list defaults to ['main'] branch if set to none
     # example targeting another multiple branches allowed to pull from
-    # updater.include_branch_list = ['master', 'dev'] # example with two branches
-    # None is the equivalent to setting ['master']
+    # updater.include_branch_list = ['main', 'dev'] # example with two branches
+    # None is the equivalent to setting ['main']
     updater.include_branch_list = None
 
     # Only allow manual install, thus prompting the user to open

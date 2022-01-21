@@ -12,7 +12,6 @@ Checks:
 * [ ] Collection name should be same as slug (file name)
 * [ ] Texture file names should start with slug
 * [ ] Texture datablock should match file name
-* [ ] Objects names should start with slug
 * [ ] Material names should start with slug
 * [ ] Texture paths should all be relative
 * [ ] "Sphere" object is default dimensions

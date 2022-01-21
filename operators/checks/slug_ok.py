@@ -10,8 +10,11 @@ def check(slug):
     if slug.lower() != slug:
         return 'ERROR', ["Slug contains uppercase characters"]
 
+    illegal_characters = []
     for char in slug:
         if char not in allowed_characters:
-            return 'ERROR', ["Slug contains illegal characters"]
+            illegal_characters.append(char)
+    if illegal_characters:
+        return 'ERROR', [f'Slug contains illegal characters ({"".join(illegal_characters)})']
 
     return result, messages

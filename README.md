@@ -27,4 +27,4 @@ Tools:
 
 Misc:
 
-* [ ] Pre-save handler to set viewport shading solid
+* [x] Pre-save handler to set viewport shading solid

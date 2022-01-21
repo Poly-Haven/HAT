@@ -11,5 +11,7 @@ def check(slug):
         except KeyError:
             result = 'ERROR'
             messages = ["No collection with slug name"]
+        else:
+            messages = ["Collection named as slug"]
 
     return result, messages

@@ -7,7 +7,7 @@ Checks:
 
 * [x] Check maps use Non-color Data when required
 * [x] Check if vertex colors exist (will screw up gltf export)
-* [ ] Unit Scale is 1.0
+* [x] Unit Scale is 1.0
 * [ ] Warning if scale is not applied
 * [ ] Collection name should be same as slug (file name)
 * [ ] Texture file names should start with slug

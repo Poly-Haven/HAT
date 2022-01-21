@@ -79,7 +79,7 @@ class HATProperties(bpy.types.PropertyGroup):
     )
     test_on_save: bpy.props.BoolProperty(
         name="Test on save",
-        description="Automatically run tests when saving this file. Enables magically after running tests manually once, disable here if that's not cool",
+        description="Automatically run tests when saving this file. Enables magically after running tests manually once",
         default=False
     )
 

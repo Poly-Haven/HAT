@@ -28,6 +28,7 @@ class HAT_PT_main (bpy.types.Panel):
 
     def draw(self, context):
         props = context.scene.hat_props
+        i = icons.get_icons()
 
         col = self.layout.column(align=True)
         row = col.row()
@@ -37,6 +38,18 @@ class HAT_PT_main (bpy.types.Panel):
         sub.prop(props, "test_on_save",
                  icon='CHECKBOX_HLT' if props.test_on_save else 'CHECKBOX_DEHLT',
                  toggle=True)
+
+        col.separator()
+        box = col.box()
+        sub = box.column(align=True)
+        sub.label(text="Understanding test results:")
+        sub.label(text="Successful test", icon='CHECKMARK')
+        sub.label(text="Question - possible minor issue, but probably fine",
+                  icon_value=i['question'].icon_id)
+        sub.label(text="Warning - possible major issue, needs investigation",
+                  icon_value=i['exclamation-triangle'].icon_id)
+        sub.label(text="Error - definite issue that needs to be fixed",
+                  icon_value=i['x-circle-fill'].icon_id)
 
         addon_updater_ops.check_for_update_background()
         addon_updater_ops.update_notice_box_ui(self, context)

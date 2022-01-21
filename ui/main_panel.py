@@ -9,7 +9,7 @@ class HAT_PT_main (bpy.types.Panel):
     bl_label = " "
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
-    bl_context = 'output'
+    bl_context = 'scene'
     bl_options = {'HEADER_LAYOUT_EXPAND', 'DEFAULT_CLOSED'}
 
     def draw_header(self, context):

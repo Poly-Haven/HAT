@@ -14,11 +14,14 @@ class HAT_PT_main (bpy.types.Panel):
 
     def draw_header(self, context):
         i = icons.get_icons()
+        props = context.scene.hat_props
+
         layout = self.layout
         row = layout.row()
         row.label(text="HAT", icon_value=i['polyhaven'].icon_id)
         sub = row.row()
         sub.alignment = 'RIGHT'
+        sub.prop(props, "asset_type", text='')
         sub.operator(check.HAT_OT_check.bl_idname,
                      text="Check", icon="CHECKMARK")
         row.separator()

@@ -68,6 +68,16 @@ class HatPreferences(bpy.types.AddonPreferences):
         addon_updater_ops.update_settings_ui(self, context)
 
 
+class HATProperties(bpy.types.PropertyGroup):
+    asset_type: bpy.props.EnumProperty(
+        name="Asset Type",
+        description="What type of asset is this?",
+        default='model',
+        items=(("model", "Model", "A 3D model to be published on polyhaven.com"),
+               ("texture", "Texture", "A texture to be published on polyhaven.com"),
+               ))
+
+
 @persistent
 def pre_save_handler(dummy):
     '''Set shading mode to solid so that it's quicker to open next time.'''
@@ -79,6 +89,7 @@ def pre_save_handler(dummy):
 
 classes = [
     HatPreferences,
+    HATProperties,
 ] + ui.classes + operators.classes
 
 
@@ -91,6 +102,7 @@ def register():
     for cls in classes:
         register_class(cls)
 
+    bpy.types.Scene.hat_props = bpy.props.PointerProperty(type=HATProperties)
     bpy.app.handlers.save_pre.append(pre_save_handler)
 
 
@@ -100,6 +112,8 @@ def unregister():
     bpy.app.handlers.save_pre.remove(pre_save_handler)
 
     icons.previews_unregister()
+
+    del bpy.types.Scene.hat_props
 
     from bpy.utils import unregister_class
     for cls in reversed(classes):

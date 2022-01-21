@@ -9,7 +9,7 @@ Checks:
 * [x] Check if vertex colors exist (will screw up gltf export)
 * [x] Unit Scale is 1.0
 * [x] Warning if scale is not applied
-* [ ] Collection name should be same as slug (file name)
+* [x] Collection name should be same as slug (file name)
 * [ ] Texture file names should start with slug
 * [ ] Texture datablock should match file name
 * [ ] Material names should start with slug

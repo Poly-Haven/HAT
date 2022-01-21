@@ -13,7 +13,7 @@ Checks:
 * [x] Texture file names should start with slug
 * [x] Texture datablock should match file name
 * [x] Material names should match or start with slug
-* [ ] Texture paths should all be relative
+* [x] Texture paths should all be relative
 * [ ] "Sphere" object is default dimensions
 * [ ] Slug naming convention
 * [x] Warning if file has unsaved changes

@@ -15,7 +15,7 @@ Checks:
 * [x] Material names should match or start with slug
 * [x] Texture paths should all be relative
 * [x] Texture "Plane" object is default dimensions
-* [ ] Slug naming convention
+* [x] Slug naming convention
 * [x] Warning if file has unsaved changes
 
 Tools:

@@ -19,7 +19,7 @@ class HAT_PT_main (bpy.types.Panel):
         layout = self.layout
         row = layout.row()
         row.label(text="HAT", icon_value=i['polyhaven'].icon_id)
-        sub = row.row()
+        sub = row.row(align=True)
         sub.alignment = 'RIGHT'
         sub.prop(props, "asset_type", text='')
         sub.operator(check.HAT_OT_check.bl_idname,

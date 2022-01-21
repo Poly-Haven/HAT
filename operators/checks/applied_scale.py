@@ -12,9 +12,14 @@ def check(slug):
         'LIGHT',
     ]
 
+    severity = 'ERROR' if bpy.context.scene.hat_props.asset_type == 'texture' else 'WARNING'
+
     for obj in bpy.data.objects:
         if obj.scale != one and obj.type not in ignored_types:
-            result = 'WARNING'
+            result = severity
             messages.append(obj.name + " has non-uniform scale")
+
+    if result == 'SUCCESS' and severity == 'ERROR':
+        messages = ['Scales are applied']
 
     return result, messages

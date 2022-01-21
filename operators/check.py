@@ -56,7 +56,7 @@ class HAT_OT_check(bpy.types.Operator):
         for c in checks.values():
             self.tests.append(c.check(slug))
 
-        return context.window_manager.invoke_props_dialog(self, width=300 * dpi_factor.dpi_factor())
+        return context.window_manager.invoke_props_dialog(self, width=350 * dpi_factor.dpi_factor())
 
     def execute(self, context):
         return {'FINISHED'}

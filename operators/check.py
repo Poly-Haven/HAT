@@ -2,6 +2,7 @@ import importlib
 import os
 import sys
 from ..utils import dpi_factor
+from .. import icons
 
 check_list = (os.path.splitext(f)[0] for f in os.listdir(
     os.path.join(os.path.dirname(__file__), 'checks')) if f.endswith('.py'))
@@ -30,16 +31,22 @@ class HAT_OT_check(bpy.types.Operator):
         return bpy.data.is_saved
 
     def draw(self, context):
-        # TODO: Use custom icons to make errors stand out.
+        i = icons.get_icons()
+        status_icon_custom = {
+            'ERROR': 'x-circle-fill',
+            'WARNING': 'exclamation-triangle',
+        }
         status_icon = {
-            'ERROR': 'CANCEL',
-            'WARNING': 'ERROR',  # Blender's "error" icon is a warning triangle...?
             'SUCCESS': 'CHECKMARK',
         }
         col = self.layout.column(align=True)
         for status, messages in self.tests:
             for message in messages:
-                col.label(text=message, icon=status_icon[status])
+                if status in status_icon_custom:
+                    col.label(text=message,
+                              icon_value=i[status_icon_custom[status]].icon_id)
+                else:
+                    col.label(text=message, icon=status_icon[status])
 
     def invoke(self, context, event):
         self.tests = []  # Reset after rerun

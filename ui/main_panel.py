@@ -23,15 +23,20 @@ class HAT_PT_main (bpy.types.Panel):
         sub.alignment = 'RIGHT'
         sub.prop(props, "asset_type", text='')
         sub.operator(check.HAT_OT_check.bl_idname,
-                     text="Check", icon="CHECKMARK")
+                     text="Check", icon="CHECKMARK").on_save = False
         row.separator()
 
     def draw(self, context):
+        props = context.scene.hat_props
+
         col = self.layout.column(align=True)
-        col.label(text="Click 'Check' above to run tests.")
-        col.separator()
-        col.label(text="Check here occasionally for updates,")
-        col.label(text="otherwise feel free to close this panel.")
+        row = col.row()
+        row.label(text="Click 'Check' above to run tests.")
+        sub = row.row()
+        sub.alignment = 'RIGHT'
+        sub.prop(props, "test_on_save",
+                 icon='CHECKBOX_HLT' if props.test_on_save else 'CHECKBOX_DEHLT',
+                 toggle=True)
 
         addon_updater_ops.check_for_update_background()
         addon_updater_ops.update_notice_box_ui(self, context)

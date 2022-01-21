@@ -75,7 +75,13 @@ class HATProperties(bpy.types.PropertyGroup):
         default='model',
         items=(("model", "Model", "A 3D model to be published on polyhaven.com"),
                ("texture", "Texture", "A texture to be published on polyhaven.com"),
-               ))
+               )
+    )
+    test_on_save: bpy.props.BoolProperty(
+        name="Test on save",
+        description="Automatically run tests when saving this file. Enables magically after running tests manually once, disable here if that's not cool",
+        default=False
+    )
 
 
 @persistent
@@ -85,6 +91,13 @@ def pre_save_handler(dummy):
         for space in (s for s in area.spaces if s.type == 'VIEW_3D'):
             if space.shading.type == 'MATERIAL':
                 space.shading.type = 'SOLID'
+
+
+@persistent
+def post_save_handler(dummy):
+    '''Run tests'''
+    if bpy.context.scene.hat_props.test_on_save:
+        bpy.ops.hat.check('INVOKE_DEFAULT', on_save=True)
 
 
 classes = [
@@ -104,12 +117,14 @@ def register():
 
     bpy.types.Scene.hat_props = bpy.props.PointerProperty(type=HATProperties)
     bpy.app.handlers.save_pre.append(pre_save_handler)
+    bpy.app.handlers.save_post.append(post_save_handler)
 
 
 def unregister():
     addon_updater_ops.unregister()
 
     bpy.app.handlers.save_pre.remove(pre_save_handler)
+    bpy.app.handlers.save_post.remove(post_save_handler)
 
     icons.previews_unregister()
 

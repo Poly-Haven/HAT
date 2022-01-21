@@ -24,6 +24,8 @@ class HAT_OT_check(bpy.types.Operator):
     bl_label = "Test results:"
     bl_description = "Run all checks"
 
+    on_save: bpy.props.BoolProperty(default=False)
+
     tests = []  # [["STATUS", [messages]]]
 
     @classmethod
@@ -42,20 +44,38 @@ class HAT_OT_check(bpy.types.Operator):
         }
         col = self.layout.column(align=True)
         for status, messages in self.tests:
+            if status == 'SUCCESS' and self.on_save:
+                continue
             for message in messages:
                 if status in status_icon_custom:
                     col.label(text=message,
                               icon_value=i[status_icon_custom[status]].icon_id)
                 else:
                     col.label(text=message, icon=status_icon[status])
+        if self.on_save:
+            row = col.row()
+            row.alignment = 'RIGHT'
+            row.prop(context.scene.hat_props, "test_on_save",
+                     icon='CHECKBOX_HLT' if context.scene.hat_props.test_on_save else 'CHECKBOX_DEHLT',
+                     toggle=True)
 
     def invoke(self, context, event):
         self.tests = []  # Reset after rerun
+        context.scene.hat_props.test_on_save = True
 
         slug = bpy.path.display_name_from_filepath(bpy.data.filepath)
 
-        for c in checks.values():
-            self.tests.append(c.check(slug))
+        for check_name, check in checks.items():
+            if self.on_save and check_name == "unsaved":
+                # No need to check for unsaved changes while we're busy saving.
+                continue
+            self.tests.append(check.check(slug))
+
+        if self.on_save:
+            failed_tests = list((t for t in self.tests if t[0] != 'SUCCESS'))
+            if len(failed_tests) == 0:
+                # No problems, no popup.
+                return {'FINISHED'}
 
         return context.window_manager.invoke_props_dialog(self, width=350 * dpi_factor.dpi_factor())
 

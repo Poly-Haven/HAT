@@ -14,17 +14,17 @@ def remove_num(s):
     return s
 
 
-def get_map_name(fp, slug, removeNum=True):
+def get_map_name(fp, slug, removeNum=True, strict=True):
     s = remove_extension(bpy.path.basename(fp))
     s = remove_num(s) if removeNum else s
 
-    if s.startswith(slug):
+    if strict and s.startswith(slug):
+        # strict assumes slug_map.ext, otherwise slug_part_map.ext
         return s[len(slug) + 1:].lower()
 
-    s = s.lower()
-    if s.endswith('nor_gl'):
+    if s.endswith('_nor_gl'):
         return 'nor_gl'
-    if s.endswith('nor_dx'):
+    if s.endswith('_nor_dx'):
         return 'nor_dx'
 
-    return s.split('_')[-1]  # Fallback
+    return s.split('_')[-1]

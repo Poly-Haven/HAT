@@ -82,6 +82,11 @@ class HATProperties(bpy.types.PropertyGroup):
         description="Automatically run tests when saving this file. Enables magically after running tests manually once",
         default=False
     )
+    expand_result_docs: bpy.props.BoolProperty(
+        name="Toggle",
+        description="Show/hide info explaining the type test results you may see",
+        default=False
+    )
 
 
 @persistent

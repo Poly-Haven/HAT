@@ -43,14 +43,18 @@ class HAT_PT_main (bpy.types.Panel):
         box = col.box()
         sub = box.column(align=True)
         sub.scale_y = 0.9
-        sub.label(text="Understanding test results:")
-        sub.label(text="Successful test", icon='CHECKMARK')
-        sub.label(text="Question - something suspicious, but could be fine",
-                  icon_value=i['question'].icon_id)
-        sub.label(text="Warning - possible issue, needs investigation",
-                  icon_value=i['exclamation-triangle'].icon_id)
-        sub.label(text="Error - definite issue that needs to be fixed",
-                  icon_value=i['x-circle-fill'].icon_id)
+        row = sub.row()
+        row.label(text="Understanding test results:")
+        row.prop(props, 'expand_result_docs', text='', toggle=True, emboss=False,
+                 icon='DOWNARROW_HLT' if props.expand_result_docs else 'RIGHTARROW')
+        if props.expand_result_docs:
+            sub.label(text="Successful test", icon='CHECKMARK')
+            sub.label(text="Question - something suspicious, but could be fine",
+                      icon_value=i['question'].icon_id)
+            sub.label(text="Warning - possible issue, needs investigation",
+                      icon_value=i['exclamation-triangle'].icon_id)
+            sub.label(text="Error - definite issue that needs to be fixed",
+                      icon_value=i['x-circle-fill'].icon_id)
 
         addon_updater_ops.check_for_update_background()
         addon_updater_ops.update_notice_box_ui(self, context)

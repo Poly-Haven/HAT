@@ -23,7 +23,7 @@ Checks:
 Tools:
 
 * [ ] Test FBX export
-* [ ] Create GLTF button (fix common path issues automatically, and test)
+* [ ] Export GLTF
 * [ ] Clean file (remove unused datablocks, including force-saved ones (e.g. in case of incompatibly licensed node groups))
 
 Misc:

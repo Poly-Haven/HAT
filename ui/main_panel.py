@@ -42,11 +42,12 @@ class HAT_PT_main (bpy.types.Panel):
         col.separator()
         box = col.box()
         sub = box.column(align=True)
+        sub.scale_y = 0.9
         sub.label(text="Understanding test results:")
         sub.label(text="Successful test", icon='CHECKMARK')
-        sub.label(text="Question - possible minor issue, but probably fine",
+        sub.label(text="Question - something suspicious, but could be fine",
                   icon_value=i['question'].icon_id)
-        sub.label(text="Warning - possible major issue, needs investigation",
+        sub.label(text="Warning - possible issue, needs investigation",
                   icon_value=i['exclamation-triangle'].icon_id)
         sub.label(text="Error - definite issue that needs to be fixed",
                   icon_value=i['x-circle-fill'].icon_id)

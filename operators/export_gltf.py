@@ -15,6 +15,16 @@ class HAT_OT_export_gltf(bpy.types.Operator):
 
     def execute(self, context):
         slug = bpy.path.display_name_from_filepath(bpy.data.filepath)
+
+        try:
+            collection = bpy.data.collections[slug]
+        except KeyError:
+            self.report({'ERROR'}, "No collection named " + slug)
+            return {'CANCELLED'}
+
+        for o in bpy.data.objects:
+            o.select_set(o in list(collection.objects))
+
         gltf_file = os.path.join(os.path.dirname(
             bpy.data.filepath), slug + '.gltf')
 
@@ -22,23 +32,37 @@ class HAT_OT_export_gltf(bpy.types.Operator):
             bpy.ops.export_scene.gltf(
                 export_format='GLTF_SEPARATE',
                 export_texture_dir='textures_TEMP',
-                export_selected=True,
                 use_selection=True,
                 export_apply=True,
                 filepath=gltf_file,
             )
 
-        rmtree(os.path.join(os.path.dirname(bpy.data.filepath), 'textures_TEMP'))
+        try:
+            rmtree(os.path.join(os.path.dirname(
+                bpy.data.filepath), 'textures_TEMP'))
+        except FileNotFoundError:
+            self.report({'WARNING'}, "No textures exported")
 
         with open(gltf_file, 'r') as json_file:
             data = json.load(json_file)
 
+        errors = []
         for p in data['images']:
             uri = p['uri']
             uri = uri.replace('textures_TEMP', 'textures')
+            if uri.endswith("_png.png"):
+                uri = uri.replace("_png.png", ".png")
+            if uri.endswith("_rough.png"):
+                uri = uri.replace("_rough.png", "_arm.png")
+
+            fp = os.path.join(os.path.dirname(bpy.data.filepath), uri)
+            if not os.path.exists(fp):
+                errors.append(uri)
+
             p['uri'] = uri
 
-        # TODO: Check images all exist, check corner cases that need correcting paths
+        if errors:
+            self.report({'ERROR'}, "Image not found:\n" + '\n'.join(errors))
 
         with open(gltf_file, 'w') as f:
             json.dump(data, f, indent=4)

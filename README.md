@@ -19,12 +19,14 @@ Checks:
 * [x] Texture "Plane" object is default dimensions
 * [x] Slug naming convention
 * [x] Warning if file has unsaved changes
+* [x] Object origin is not (0,0,0)
 
 Tools:
 
 * [ ] Test FBX export
 * [ ] Export GLTF
 * [ ] Clean file (remove unused datablocks, including force-saved ones (e.g. in case of incompatibly licensed node groups))
+* [ ] Measure real world scale of textures
 
 Misc:
 

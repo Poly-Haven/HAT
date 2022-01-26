@@ -1,5 +1,4 @@
 import bpy
-from .. import addon_updater_ops
 from ..operators import check
 from ..operators import export_gltf
 from ..operators import fix_img_db_name
@@ -73,6 +72,3 @@ class HAT_PT_main (bpy.types.Panel):
             text=f'Export {props.asset_type} GLTF',
             icon="FILE",
         )
-
-        addon_updater_ops.check_for_update_background()
-        addon_updater_ops.update_notice_box_ui(self, context)

@@ -1,11 +1,9 @@
 if "bpy" not in locals():
-    from . import addon_updater_ops
     from . import ui
     from . import operators
     from . import icons
 else:
     import imp
-    imp.reload(addon_updater_ops)
     imp.reload(ui)
     imp.reload(operators)
     imp.reload(icons)
@@ -25,47 +23,6 @@ bl_info = {
     "tracker_url": "https://github.com/Poly-Haven/HAT/issues",
     "category": "Scene",
 }
-
-
-class HatPreferences(bpy.types.AddonPreferences):
-    bl_idname = __package__
-
-    # Add-on Updater Prefs
-    auto_check_update: bpy.props.BoolProperty(
-        name="Auto-check for Update",
-        description="If enabled, auto-check for updates using an interval",
-        default=True,
-    )
-    updater_intrval_months: bpy.props.IntProperty(
-        name='Months',
-        description="Number of months between checking for updates",
-        default=0,
-        min=0
-    )
-    updater_intrval_days: bpy.props.IntProperty(
-        name='Days',
-        description="Number of days between checking for updates",
-        default=1,
-        min=0,
-    )
-    updater_intrval_hours: bpy.props.IntProperty(
-        name='Hours',
-        description="Number of hours between checking for updates",
-        default=0,
-        min=0,
-        max=23
-    )
-    updater_intrval_minutes: bpy.props.IntProperty(
-        name='Minutes',
-        description="Number of minutes between checking for updates",
-        default=0,
-        min=0,
-        max=59
-    )
-    updater_expand_prefs: bpy.props.BoolProperty(default=False)
-
-    def draw(self, context):
-        addon_updater_ops.update_settings_ui(self, context)
 
 
 class HATProperties(bpy.types.PropertyGroup):
@@ -106,14 +63,11 @@ def post_save_handler(dummy):
 
 
 classes = [
-    HatPreferences,
     HATProperties,
 ] + ui.classes + operators.classes
 
 
 def register():
-    addon_updater_ops.register(bl_info)
-
     icons.previews_register()
 
     from bpy.utils import register_class
@@ -126,8 +80,6 @@ def register():
 
 
 def unregister():
-    addon_updater_ops.unregister()
-
     bpy.app.handlers.save_pre.remove(pre_save_handler)
     bpy.app.handlers.save_post.remove(post_save_handler)
 

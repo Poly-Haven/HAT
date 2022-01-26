@@ -63,7 +63,11 @@ class HAT_PT_main (bpy.types.Panel):
         col.separator()
 
         col = self.layout.column()
-        col.operator(export_gltf.HAT_OT_export_gltf.bl_idname, icon="FILE")
+        col.operator(
+            export_gltf.HAT_OT_export_gltf.bl_idname,
+            text=f'Export {props.asset_type} GLTF',
+            icon="FILE",
+        )
 
         addon_updater_ops.check_for_update_background()
         addon_updater_ops.update_notice_box_ui(self, context)

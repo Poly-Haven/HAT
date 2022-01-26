@@ -17,7 +17,7 @@ bl_info = {
     "name": "HAT: Haven Asset Tester",
     "description": "Internal quality control tool for polyhaven.com",
     "author": "Poly Haven: Greg Zaal, James Cock",
-    "version": (1, 0, 2),
+    "version": (1, 0, 3),
     "blender": (3, 0, 0),
     "location": "Properties > Scene",
     "warning": "",

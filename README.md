@@ -1,6 +1,19 @@
 # HAT
 Haven Asset Tester - A Blender add-on we use for asset QC
 
+## How to install:
+
+1. [Download this](https://github.com/Poly-Haven/HAT/archive/refs/heads/main.zip)
+2. Install it inside Blender's Preferences.
+3. If you get a big error that ends with *"ModuleNotFoundError: No module named 'HAT'"*, simply rename the `HAT-main` folder in `%appdata%\Blender Foundation\Blender\x.x\scripts\addons` to just `HAT` and restart Blender.
+
+## How to update to new versions:
+
+1. Close Blender.
+2. Double click on `_UPDATE.bat` in `%appdata%\Blender Foundation\Blender\x.x\scripts\addons\HAT`.
+3. If you're presented with an error like: *"'git' is not recognized as an internal or external command..."*, you need to first [install git](https://git-scm.com/download/win).
+4. Restart Blender.
+
 ## Features / to do:
 
 Checks:

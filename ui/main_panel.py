@@ -3,6 +3,7 @@ from .. import addon_updater_ops
 from ..operators import check
 from ..operators import export_gltf
 from ..operators import fix_img_db_name
+from ..operators import scrub_datablocks
 from .. import icons
 
 
@@ -57,6 +58,10 @@ class HAT_PT_main (bpy.types.Panel):
                       icon_value=i['exclamation-triangle'].icon_id)
             sub.label(text="Error - definite issue that needs to be fixed",
                       icon_value=i['x-circle-fill'].icon_id)
+
+        col = self.layout.column()
+        col.operator(
+            scrub_datablocks.HAT_OT_scrub_datablocks.bl_idname, icon="TRASH")
         col.operator(
             fix_img_db_name.HAT_OT_fix_img_db_name.bl_idname, icon="COPY_ID")
 

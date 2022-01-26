@@ -25,7 +25,7 @@ Tools:
 
 * [ ] Test FBX export
 * [x] Export GLTF
-* [ ] Clean file (remove unused datablocks, including force-saved ones (e.g. in case of incompatibly licensed node groups))
+* [x] Clean file of unused datablocks, including fake-user ones
 * [ ] Measure real world scale of textures
 
 Misc:

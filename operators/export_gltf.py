@@ -199,6 +199,9 @@ class HAT_OT_export_gltf(bpy.types.Operator):
                 uri = uri.replace("_png.png", ".png")
             if uri.endswith("_rough.png"):
                 uri = uri.replace("_rough.png", "_arm.png")
+            if uri.endswith('-' + slug + '_arm.png'):
+                # Turn slug_metal-slug_arm into slug_arm
+                uri = 'textures/' + slug + '_arm.png'
 
             fp = os.path.join(os.path.dirname(bpy.data.filepath), uri)
             if not os.path.exists(fp):

@@ -10,6 +10,8 @@ def fetch_textures():
             continue
         for node in mat.node_tree.nodes:
             if node.type == 'TEX_IMAGE':
+                if not node.image.filepath:
+                    continue  # e.g. Generated textures
                 if node.image.filepath in checked_files:
                     continue
                 checked_files.append(node.image.filepath)

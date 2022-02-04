@@ -108,7 +108,14 @@ def export_texture(cls, context, slug, gltf_file):
     disp_mod = obj.modifiers.new('DisplacementMod', 'DISPLACE')
     disp_mod.texture = disp_texture
     disp_mod.texture_coords = 'UV'
-    disp_node = mat.node_tree.nodes["Displacement"]
+    disp_node = None
+    for n in mat.node_tree.nodes:
+        if n.type == 'DISPLACEMENT':
+            disp_node = n
+            break
+    if not disp_node:
+        cls.report({'ERROR'}, "No displacement node")
+        return {'CANCELLED'}
     disp_mod.strength = disp_node.inputs[2].default_value
     disp_mod.mid_level = disp_node.inputs[1].default_value
     mapping_node = mat.node_tree.nodes["Mapping"]

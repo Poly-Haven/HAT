@@ -46,6 +46,7 @@ Checks:
 * [x] Warning if file has unsaved changes
 * [x] Object origin is not (0,0,0)
 * [ ] Only one scene and viewlayer
+* [ ] Make sure units are in meters
 
 Tools:
 

@@ -46,11 +46,20 @@ class HATProperties(bpy.types.PropertyGroup):
     )
 
 
+# Remember what shading type each space used to restore after saving
+space_shading_types = {}
+
+
 @persistent
 def pre_save_handler(dummy):
     '''Set shading mode to solid so that it's quicker to open next time.'''
+    global space_shading_types
+    space_shading_types = {}
     for area in (a for a in bpy.context.screen.areas if a.type == 'VIEW_3D'):
         for space in (s for s in area.spaces if s.type == 'VIEW_3D'):
+            if space.shading.type not in space_shading_types:
+                space_shading_types[space.shading.type] = []
+            space_shading_types[space.shading.type].append(space)
             if space.shading.type == 'MATERIAL':
                 space.shading.type = 'SOLID'
 
@@ -60,6 +69,11 @@ def post_save_handler(dummy):
     '''Run tests'''
     if bpy.context.scene.hat_props.test_on_save:
         bpy.ops.hat.check('INVOKE_DEFAULT', on_save=True)
+
+    for t, spaces in space_shading_types.items():
+        for s in spaces:
+            if s.shading.type != t:
+                s.shading.type = t
 
 
 classes = [

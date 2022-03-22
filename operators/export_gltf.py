@@ -119,8 +119,10 @@ def export_texture(cls, context, slug, gltf_file):
     disp_mod.strength = disp_node.inputs[2].default_value
     disp_mod.mid_level = disp_node.inputs[1].default_value
     mapping_node = mat.node_tree.nodes["Mapping"]
-    D.textures['Displacement'].repeat_x = mapping_node.inputs[3].default_value[0]
-    D.textures['Displacement'].repeat_y = mapping_node.inputs[3].default_value[1]
+    D.textures['Displacement'].repeat_x = round(
+        mapping_node.inputs[3].default_value[0])
+    D.textures['Displacement'].repeat_y = round(
+        mapping_node.inputs[3].default_value[1])
 
     # CREATE DECIMATE MODIFIER
     decimate_mod = obj.modifiers.new('DecimateMod', 'DECIMATE')

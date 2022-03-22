@@ -47,6 +47,8 @@ Checks:
 * [x] Object origin is not (0,0,0)
 * [ ] Only one scene and viewlayer
 * [ ] Make sure units are in meters
+* [ ] Warn if shapekeys exist which may cause issues for gltf export
+* [ ] Main collection is visible and renderable
 
 Tools:
 

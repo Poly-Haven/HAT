@@ -29,7 +29,7 @@ class HAT_OT_fix_img_db_name(bpy.types.Operator):
                     self.fixed.append(fn)
 
         if self.fixed:
-            return context.window_manager.invoke_props_dialog(self, width=350 * dpi_factor.dpi_factor())
+            return context.window_manager.invoke_props_dialog(self, width=round(350 * dpi_factor.dpi_factor()))
         else:
             return context.window_manager.invoke_props_popup(self, event)
 

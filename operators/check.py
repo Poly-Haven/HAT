@@ -77,7 +77,7 @@ class HAT_OT_check(bpy.types.Operator):
                 # No problems, no popup.
                 return {'FINISHED'}
 
-        return context.window_manager.invoke_props_dialog(self, width=350 * dpi_factor.dpi_factor())
+        return context.window_manager.invoke_props_dialog(self, width=round(350 * dpi_factor.dpi_factor()))
 
     def execute(self, context):
         return {'FINISHED'}

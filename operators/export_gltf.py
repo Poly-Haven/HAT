@@ -196,6 +196,8 @@ class HAT_OT_export_gltf(bpy.types.Operator):
                 bpy.data.filepath), 'textures_TEMP'))
         except FileNotFoundError:
             cls.report({'WARNING'}, "No textures exported")
+        except PermissionError:
+            cls.report({'WARNING'}, "Couldn't delete textures_TEMP folder")
 
         with open(gltf_file, 'r') as json_file:
             data = json.load(json_file)

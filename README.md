@@ -37,6 +37,7 @@ Checks:
 * [x] Collection name should be same as slug (file name)
 * [x] Texture file names should start with slug
 * [x] Texture datablock should match file name
+* [x] Texture files exist
 * [x] Texture map names should be standardized
 * [x] No packed texture files
 * [x] Material names should match or start with slug

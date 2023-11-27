@@ -4,6 +4,7 @@ if "bpy" not in locals():
     from . import icons
 else:
     import imp
+
     imp.reload(ui)
     imp.reload(operators)
     imp.reload(icons)
@@ -29,20 +30,21 @@ class HATProperties(bpy.types.PropertyGroup):
     asset_type: bpy.props.EnumProperty(
         name="Asset Type",
         description="What type of asset is this?",
-        default='model',
-        items=(("model", "Model", "A 3D model to be published on polyhaven.com"),
-               ("texture", "Texture", "A texture to be published on polyhaven.com"),
-               )
+        default="model",
+        items=(
+            ("model", "Model", "A 3D model to be published on polyhaven.com"),
+            ("texture", "Texture", "A texture to be published on polyhaven.com"),
+        ),
     )
     test_on_save: bpy.props.BoolProperty(
         name="Test on save",
-        description="Automatically run tests when saving this file. Enables magically after running tests manually once",
-        default=False
+        description=(
+            "Automatically run tests when saving this file. Enables magically after running tests manually once"
+        ),
+        default=False,
     )
     expand_result_docs: bpy.props.BoolProperty(
-        name="Toggle",
-        description="Show/hide info explaining the type test results you may see",
-        default=False
+        name="Toggle", description="Show/hide info explaining the type test results you may see", default=False
     )
 
 
@@ -52,23 +54,23 @@ space_shading_types = {}
 
 @persistent
 def pre_save_handler(dummy):
-    '''Set shading mode to solid so that it's quicker to open next time.'''
+    """Set shading mode to solid so that it's quicker to open next time."""
     global space_shading_types
     space_shading_types = {}
-    for area in (a for a in bpy.context.screen.areas if a.type == 'VIEW_3D'):
-        for space in (s for s in area.spaces if s.type == 'VIEW_3D'):
+    for area in (a for a in bpy.context.screen.areas if a.type == "VIEW_3D"):
+        for space in (s for s in area.spaces if s.type == "VIEW_3D"):
             if space.shading.type not in space_shading_types:
                 space_shading_types[space.shading.type] = []
             space_shading_types[space.shading.type].append(space)
-            if space.shading.type == 'MATERIAL':
-                space.shading.type = 'SOLID'
+            if space.shading.type == "MATERIAL":
+                space.shading.type = "SOLID"
 
 
 @persistent
 def post_save_handler(dummy):
-    '''Run tests'''
+    """Run tests"""
     if bpy.context.scene.hat_props.test_on_save:
-        bpy.ops.hat.check('INVOKE_DEFAULT', on_save=True)
+        bpy.ops.hat.check("INVOKE_DEFAULT", on_save=True)
 
     for t, spaces in space_shading_types.items():
         for s in spaces:
@@ -76,15 +78,20 @@ def post_save_handler(dummy):
                 s.shading.type = t
 
 
-classes = [
-    HATProperties,
-] + ui.classes + operators.classes
+classes = (
+    [
+        HATProperties,
+    ]
+    + ui.classes
+    + operators.classes
+)
 
 
 def register():
     icons.previews_register()
 
     from bpy.utils import register_class
+
     for cls in classes:
         register_class(cls)
 
@@ -102,6 +109,7 @@ def unregister():
     del bpy.types.Scene.hat_props
 
     from bpy.utils import unregister_class
+
     for cls in reversed(classes):
         unregister_class(cls)
 

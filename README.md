@@ -58,7 +58,6 @@ Tools:
 * [x] Clean file of unused datablocks, including fake-user ones
 * [x] Make image datablock names match their file names
 * [ ] Make mesh datablock name match object name
-* [ ] Measure real world scale of textures
 
 Misc:
 

@@ -128,10 +128,9 @@ def export_texture(cls, context, slug, gltf_file):
     decimate_mod = obj.modifiers.new("DecimateMod", "DECIMATE")
     decimate_mod.ratio = 0.285
 
-    # Correct Smoothing
-    obj.data.use_auto_smooth = True
-    obj.data.auto_smooth_angle = 180
-    obj.modifiers.new("WeightedNormal", "WEIGHTED_NORMAL")
+    # Ensure Smoothing
+    for f in obj.data.polygons:
+        f.use_smooth = True
 
     # EXPORT GLTF
     bpy.ops.export_scene.gltf(

@@ -11,16 +11,16 @@ def export_model(cls, context, slug, gltf_file):
     try:
         collection = bpy.data.collections[slug]
     except KeyError:
-        cls.report({'ERROR'}, "No collection named " + slug)
-        return {'CANCELLED'}
+        cls.report({"ERROR"}, "No collection named " + slug)
+        return {"CANCELLED"}
 
     for o in bpy.data.objects:
         o.select_set(o in list(collection.objects))
 
-    if context.scene.hat_props.asset_type == 'model':
+    if context.scene.hat_props.asset_type == "model":
         bpy.ops.export_scene.gltf(
-            export_format='GLTF_SEPARATE',
-            export_texture_dir='textures_TEMP',
+            export_format="GLTF_SEPARATE",
+            export_texture_dir="textures_TEMP",
             use_selection=True,
             export_apply=True,
             filepath=gltf_file,
@@ -30,7 +30,7 @@ def export_model(cls, context, slug, gltf_file):
 def export_texture(cls, context, slug, gltf_file):
 
     def find_disp(images):
-        disp_options = ['disp', 'displacement', 'height']
+        disp_options = ["disp", "displacement", "height"]
         for img in images:
             if not img.filepath:
                 continue
@@ -42,16 +42,16 @@ def export_texture(cls, context, slug, gltf_file):
     D = bpy.data
 
     try:
-        plane = D.objects['Plane']
+        plane = D.objects["Plane"]
     except KeyError:
-        cls.report({'ERROR'}, "No 'Plane' object found")
-        return {'CANCELLED'}
+        cls.report({"ERROR"}, "No 'Plane' object found")
+        return {"CANCELLED"}
 
     try:
         mat = D.materials[slug]
     except KeyError:
-        cls.report({'ERROR'}, "No material with slug name")
-        return {'CANCELLED'}
+        cls.report({"ERROR"}, "No material with slug name")
+        return {"CANCELLED"}
 
     bm = bmesh.new()
 
@@ -62,21 +62,23 @@ def export_texture(cls, context, slug, gltf_file):
 
     # CREATE SPHERE
     bpy.ops.mesh.primitive_uv_sphere_add(
-        segments=256, ring_count=128, enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
+        segments=256, ring_count=128, enter_editmode=False, align="WORLD", location=(0, 0, 0), scale=(1, 1, 1)
+    )
     obj = context.active_object
-    obj.name = 'sphere_gltf'
+    obj.name = "sphere_gltf"
     obj.dimensions = (scale, scale, scale)
     bpy.ops.object.shade_smooth()
-    bpy.ops.object.modifier_add(type='REMESH')
+    bpy.ops.object.modifier_add(type="REMESH")
     obj.modifiers["Remesh"].use_smooth_shade = True
     obj.modifiers["Remesh"].voxel_size = 0.01
     bpy.ops.object.modifier_apply(modifier="Remesh")
 
     bpy.ops.object.editmode_toggle()
 
-    bpy.ops.mesh.select_all(action='SELECT')
-    bpy.ops.uv.sphere_project(direction='VIEW_ON_EQUATOR', align='POLAR_ZX',
-                              correct_aspect=True, clip_to_bounds=False, scale_to_bounds=False)
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.uv.sphere_project(
+        direction="VIEW_ON_EQUATOR", align="POLAR_ZX", correct_aspect=True, clip_to_bounds=False, scale_to_bounds=False
+    )
 
     me = obj.data
     bm = bmesh.from_edit_mesh(me)
@@ -97,46 +99,44 @@ def export_texture(cls, context, slug, gltf_file):
     # CREATE TEXTURE DATA BLOCK
     disp_image = find_disp(D.images)
 
-    if disp_image == None:
-        cls.report({'ERROR'}, "Could not find displacement data block")
-        return {'CANCELLED'}
+    if disp_image is None:
+        cls.report({"ERROR"}, "Could not find displacement data block")
+        return {"CANCELLED"}
 
-    disp_texture = D.textures.new('Displacement', 'IMAGE')
+    disp_texture = D.textures.new("Displacement", "IMAGE")
     disp_texture.image = disp_image
 
     # CREATE DISPLACEMENT MODIFIER
-    disp_mod = obj.modifiers.new('DisplacementMod', 'DISPLACE')
+    disp_mod = obj.modifiers.new("DisplacementMod", "DISPLACE")
     disp_mod.texture = disp_texture
-    disp_mod.texture_coords = 'UV'
+    disp_mod.texture_coords = "UV"
     disp_node = None
     for n in mat.node_tree.nodes:
-        if n.type == 'DISPLACEMENT':
+        if n.type == "DISPLACEMENT":
             disp_node = n
             break
     if not disp_node:
-        cls.report({'ERROR'}, "No displacement node")
-        return {'CANCELLED'}
+        cls.report({"ERROR"}, "No displacement node")
+        return {"CANCELLED"}
     disp_mod.strength = disp_node.inputs[2].default_value
     disp_mod.mid_level = disp_node.inputs[1].default_value
     mapping_node = mat.node_tree.nodes["Mapping"]
-    D.textures['Displacement'].repeat_x = round(
-        mapping_node.inputs[3].default_value[0])
-    D.textures['Displacement'].repeat_y = round(
-        mapping_node.inputs[3].default_value[1])
+    D.textures["Displacement"].repeat_x = round(mapping_node.inputs[3].default_value[0])
+    D.textures["Displacement"].repeat_y = round(mapping_node.inputs[3].default_value[1])
 
     # CREATE DECIMATE MODIFIER
-    decimate_mod = obj.modifiers.new('DecimateMod', 'DECIMATE')
+    decimate_mod = obj.modifiers.new("DecimateMod", "DECIMATE")
     decimate_mod.ratio = 0.285
 
     # Correct Smoothing
     obj.data.use_auto_smooth = True
     obj.data.auto_smooth_angle = 180
-    obj.modifiers.new('WeightedNormal', 'WEIGHTED_NORMAL')
+    obj.modifiers.new("WeightedNormal", "WEIGHTED_NORMAL")
 
     # EXPORT GLTF
     bpy.ops.export_scene.gltf(
-        export_format='GLTF_SEPARATE',
-        export_texture_dir='textures_TEMP',
+        export_format="GLTF_SEPARATE",
+        export_texture_dir="textures_TEMP",
         use_selection=True,
         export_apply=True,
         filepath=gltf_file,
@@ -145,28 +145,28 @@ def export_texture(cls, context, slug, gltf_file):
     # Delete new sphere
     bpy.data.objects.remove(obj, do_unlink=True)
 
-    with open(gltf_file, 'r') as json_file:
+    with open(gltf_file, "r") as json_file:
         gltf_data = json.load(json_file)
 
     old_arm_fn = None
-    for p in gltf_data['images']:
-        if p['uri'].endswith('-' + slug + '_rough.png'):
+    for p in gltf_data["images"]:
+        if p["uri"].endswith("-" + slug + "_rough.png"):
             # Found Packed texture, Renamed to _arm
-            old_arm_fn = os.path.basename(p['uri'])
-            p['uri'] = 'textures/' + slug + '_arm.png'
+            old_arm_fn = os.path.basename(p["uri"])
+            p["uri"] = "textures/" + slug + "_arm.png"
             break
-        elif p['uri'].endswith(slug + '_rough.png'):
+        elif p["uri"].endswith(slug + "_rough.png"):
             # No packed texture found. Defaulted to using only roughness.
-            p['uri'] = 'textures/' + slug + '_rough.png'
+            p["uri"] = "textures/" + slug + "_rough.png"
             break
 
-    with open(gltf_file, 'w') as jsonfile:
+    with open(gltf_file, "w") as jsonfile:
         json.dump(gltf_data, jsonfile, indent=4)
 
     # RENAME PACKED FILE
     if old_arm_fn:
-        old_arm = os.path.join(folder, 'textures_TEMP', old_arm_fn)
-        new_arm = os.path.join(folder, 'textures', slug + '_arm.png')
+        old_arm = os.path.join(folder, "textures_TEMP", old_arm_fn)
+        new_arm = os.path.join(folder, "textures", slug + "_arm.png")
         if not os.path.exists(new_arm):
             os.rename(old_arm, new_arm)
 
@@ -183,47 +183,45 @@ class HAT_OT_export_gltf(bpy.types.Operator):
     def execute(cls, context):
         slug = bpy.path.display_name_from_filepath(bpy.data.filepath)
 
-        gltf_file = os.path.join(os.path.dirname(
-            bpy.data.filepath), slug + '.gltf')
+        gltf_file = os.path.join(os.path.dirname(bpy.data.filepath), slug + ".gltf")
 
-        if context.scene.hat_props.asset_type == 'model':
+        if context.scene.hat_props.asset_type == "model":
             export_model(cls, context, slug, gltf_file)
         else:
             export_texture(cls, context, slug, gltf_file)
 
         try:
-            rmtree(os.path.join(os.path.dirname(
-                bpy.data.filepath), 'textures_TEMP'))
+            rmtree(os.path.join(os.path.dirname(bpy.data.filepath), "textures_TEMP"))
         except FileNotFoundError:
-            cls.report({'WARNING'}, "No textures exported")
+            cls.report({"WARNING"}, "No textures exported")
         except PermissionError:
-            cls.report({'WARNING'}, "Couldn't delete textures_TEMP folder")
+            cls.report({"WARNING"}, "Couldn't delete textures_TEMP folder")
 
-        with open(gltf_file, 'r') as json_file:
+        with open(gltf_file, "r") as json_file:
             data = json.load(json_file)
 
         errors = []
-        for p in data['images']:
-            uri = p['uri']
-            uri = uri.replace('textures_TEMP', 'textures')
+        for p in data["images"]:
+            uri = p["uri"]
+            uri = uri.replace("textures_TEMP", "textures")
             if uri.endswith("_png.png"):
                 uri = uri.replace("_png.png", ".png")
             if uri.endswith("_rough.png"):
                 uri = uri.replace("_rough.png", "_arm.png")
-            if uri.endswith('-' + slug + '_arm.png'):
+            if uri.endswith("-" + slug + "_arm.png"):
                 # Turn slug_metal-slug_arm into slug_arm
-                uri = 'textures/' + slug + '_arm.png'
+                uri = "textures/" + slug + "_arm.png"
 
             fp = os.path.join(os.path.dirname(bpy.data.filepath), uri)
             if not os.path.exists(fp):
                 errors.append(uri)
 
-            p['uri'] = uri
+            p["uri"] = uri
 
         if errors:
-            cls.report({'ERROR'}, "Image not found:\n" + '\n'.join(errors))
+            cls.report({"ERROR"}, "Image not found:\n" + "\n".join(errors))
 
-        with open(gltf_file, 'w') as f:
+        with open(gltf_file, "w") as f:
             json.dump(data, f, indent=4)
 
-        return {'FINISHED'}
+        return {"FINISHED"}

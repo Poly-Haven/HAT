@@ -95,6 +95,8 @@ def register():
     for cls in classes:
         register_class(cls)
 
+    bpy.types.ASSETBROWSER_MT_editor_menus.append(operators.duplicate_asset.btn_draw)
+
     bpy.types.Scene.hat_props = bpy.props.PointerProperty(type=HATProperties)
     bpy.app.handlers.save_pre.append(pre_save_handler)
     bpy.app.handlers.save_post.append(post_save_handler)
@@ -107,6 +109,8 @@ def unregister():
     icons.previews_unregister()
 
     del bpy.types.Scene.hat_props
+
+    bpy.types.ASSETBROWSER_MT_editor_menus.remove(operators.duplicate_asset.btn_draw)
 
     from bpy.utils import unregister_class
 

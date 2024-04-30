@@ -13,6 +13,8 @@ def check(slug):
                 if not hasattr(item, "users"):
                     continue
                 if item.users == 0:
+                    if data_type == "images" and item.name == "Render Result":
+                        continue
                     dt_name = data_type.replace("_", " ")
                     result = "ERROR"
                     messages.append(f"Unused {dt_name}: {item.name}")

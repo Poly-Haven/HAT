@@ -18,7 +18,8 @@
   "python.linting.flake8Enabled": true,
   "files.exclude": {
       "**/__pycache__": true,
-      ".idea": true
+      ".idea": true,
+      "hat_updater": true,
   },
   "editor.tabSize": 4,
 }

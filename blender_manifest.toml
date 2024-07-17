@@ -20,4 +20,5 @@ paths_exclude_pattern = [
     "/*.zip",
     "/*.bat",
     ".gitignore",
+    "index.json",
 ]

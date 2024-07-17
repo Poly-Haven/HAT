@@ -12,19 +12,6 @@ else:
 import bpy
 from bpy.app.handlers import persistent
 
-bl_info = {
-    "name": "HAT: Haven Asset Tester",
-    "description": "Internal quality control tool for polyhaven.com",
-    "author": "Poly Haven: Greg Zaal, James Cock",
-    "version": (1, 0, 17),
-    "blender": (3, 2, 0),
-    "location": "Properties > Scene",
-    "warning": "",
-    "wiki_url": "https://github.com/Poly-Haven/HAT",
-    "tracker_url": "https://github.com/Poly-Haven/HAT/issues",
-    "category": "Scene",
-}
-
 
 class HATProperties(bpy.types.PropertyGroup):
     asset_type: bpy.props.EnumProperty(

@@ -11,9 +11,9 @@ check_list = (
 checks = {}
 for c in check_list:
     if "bpy" not in locals():
-        m = importlib.import_module("." + c, "HAT.operators.checks")
+        m = importlib.import_module(".checks." + c, __package__)
     else:
-        m = sys.modules["HAT.operators.checks." + c]
+        m = sys.modules["bl_ext.user_default.polyhaven_hat.operators.checks." + c]
         importlib.reload(m)
     checks[c] = m
 

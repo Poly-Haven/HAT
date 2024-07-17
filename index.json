@@ -1,0 +1,27 @@
+{
+  "version": "v1",
+  "blocklist": [],
+  "data": [
+    {
+      "schema_version": "1.0.0",
+      "id": "polyhaven_hat",
+      "name": "HAT",
+      "tagline": "Internal quality control tool for polyhaven.com",
+      "version": "1.0.18",
+      "type": "add-on",
+      "maintainer": "Greg Zaal <greg@polyhaven.com>",
+      "license": [
+        "SPDX:GPL-2.0-or-later"
+      ],
+      "blender_version_min": "4.2.0",
+      "website": "https://github.com/Poly-Haven/HAT",
+      "tags": [
+        "Scene",
+        "Import-Export"
+      ],
+      "archive_url": "./polyhaven_hat-1.0.18.zip",
+      "archive_size": 182269,
+      "archive_hash": "sha256:ad3b82d9cb9a0b73b4887e5856aeb2fd14ddbce436e426f744cd87f1a6c17693"
+    }
+  ]
+}

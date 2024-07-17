@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "polyhaven_hat"
-version = "1.0.19"
+version = "1.0.20"
 name = "HAT"
 tagline = "Internal quality control tool for polyhaven.com"
 maintainer = "Greg Zaal <greg@polyhaven.com>"
@@ -20,5 +20,5 @@ paths_exclude_pattern = [
     "/*.zip",
     "/*.bat",
     ".gitignore",
-    "index.json",
+    "/index.json",
 ]

@@ -19,7 +19,7 @@
         "Scene",
         "Import-Export"
       ],
-      "archive_url": "./polyhaven_hat-1.0.18.zip",
+      "archive_url": "https://github.com/Poly-Haven/HAT/releases/download/v1.0.18/polyhaven_hat-1.0.18.zip",
       "archive_size": 182269,
       "archive_hash": "sha256:ad3b82d9cb9a0b73b4887e5856aeb2fd14ddbce436e426f744cd87f1a6c17693"
     }

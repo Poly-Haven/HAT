@@ -134,6 +134,15 @@ def export_texture(cls, context, slug, gltf_file):
     for f in obj.data.polygons:
         f.use_smooth = True
 
+    # Remove any Anisotropic textures
+    for n in mat.node_tree.nodes:
+        if n.type == "BSDF_PRINCIPLED":
+            for i in n.inputs:
+                if i.name.startswith("Anisotropic"):
+                    for link in i.links:
+                        if link.from_node.type == "TEX_IMAGE":
+                            mat.node_tree.nodes.remove(link.from_node)
+
     # EXPORT GLTF
     bpy.ops.export_scene.gltf(
         export_format="GLTF_SEPARATE",

@@ -8,9 +8,11 @@ from ..utils.filename_utils import get_map_name
 
 
 def export_model(cls, context, slug, gltf_file):
-    try:
+    if f"{slug}_LOD0" in bpy.data.collections:
         collection = bpy.data.collections[slug]
-    except KeyError:
+    elif slug in bpy.data.collections:
+        collection = bpy.data.collections[slug]
+    else:
         cls.report({"ERROR"}, "No collection named " + slug)
         return {"CANCELLED"}
 

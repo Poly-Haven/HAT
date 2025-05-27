@@ -9,7 +9,7 @@ from ..utils.filename_utils import get_map_name
 
 def export_model(cls, context, slug, gltf_file):
     if f"{slug}_LOD0" in bpy.data.collections:
-        collection = bpy.data.collections[slug]
+        collection = bpy.data.collections[f"{slug}_LOD0"]
     elif slug in bpy.data.collections:
         collection = bpy.data.collections[slug]
     else:

@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "polyhaven_hat"
-version = "1.0.22"
+version = "1.0.23"
 name = "HAT"
 tagline = "Internal quality control tool for polyhaven.com"
 maintainer = "Greg Zaal <greg@polyhaven.com>"

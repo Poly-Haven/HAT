@@ -4,7 +4,7 @@ import json
 import mathutils
 import os
 from shutil import rmtree
-from ..utils.filename_utils import get_map_name
+from ..utils.filename_utils import get_map_name, get_slug
 
 
 def export_model(cls, context, slug, gltf_file):
@@ -191,7 +191,7 @@ class HAT_OT_export_gltf(bpy.types.Operator):
         return bpy.data.is_saved
 
     def execute(cls, context):
-        slug = bpy.path.display_name_from_filepath(bpy.data.filepath)
+        slug = get_slug()
 
         gltf_file = os.path.join(os.path.dirname(bpy.data.filepath), slug + ".gltf")
 

@@ -1,5 +1,6 @@
 import bpy
 import os
+from ..utils.filename_utils import get_slug
 
 
 class HAT_OT_export_fbx(bpy.types.Operator):
@@ -9,18 +10,17 @@ class HAT_OT_export_fbx(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.data.is_saved and context.scene.hat_props.asset_type == 'model'
+        return bpy.data.is_saved and context.scene.hat_props.asset_type == "model"
 
     def execute(cls, context):
-        slug = bpy.path.display_name_from_filepath(bpy.data.filepath)
-        to_file = os.path.join(os.path.dirname(
-            bpy.data.filepath), slug + '.fbx')
+        slug = get_slug()
+        to_file = os.path.join(os.path.dirname(bpy.data.filepath), slug + ".fbx")
 
         try:
             collection = bpy.data.collections[slug]
         except KeyError:
-            cls.report({'ERROR'}, "No collection named " + slug)
-            return {'CANCELLED'}
+            cls.report({"ERROR"}, "No collection named " + slug)
+            return {"CANCELLED"}
 
         for o in bpy.data.objects:
             o.select_set(o in list(collection.objects))
@@ -28,18 +28,15 @@ class HAT_OT_export_fbx(bpy.types.Operator):
         # Correct and collect image file paths
         for img in bpy.data.images:
             if img.filepath.lower().startswith("//textures"):
-                print("INCLUDE_FILE:", img.filepath[2:].replace('\\', '/'))
-                img.filepath = os.path.join(
-                    os.path.dirname(to_file),
-                    img.filepath[len("//"):]
-                ).replace('\\', '/')
+                print("INCLUDE_FILE:", img.filepath[2:].replace("\\", "/"))
+                img.filepath = os.path.join(os.path.dirname(to_file), img.filepath[len("//") :]).replace("\\", "/")
 
         # Export FBX
         bpy.ops.export_scene.fbx(
             filepath=to_file,
-            path_mode='RELATIVE',
+            path_mode="RELATIVE",
             check_existing=False,
             use_selection=True,
         )
 
-        return {'FINISHED'}
+        return {"FINISHED"}

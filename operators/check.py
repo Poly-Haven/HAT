@@ -2,6 +2,7 @@ import importlib
 import os
 import sys
 from ..utils import dpi_factor
+from ..utils.filename_utils import get_slug
 from .. import icons
 
 check_list = (
@@ -66,7 +67,7 @@ class HAT_OT_check(bpy.types.Operator):
         self.tests = []  # Reset after rerun
         context.scene.hat_props.test_on_save = True
 
-        slug = bpy.path.display_name_from_filepath(bpy.data.filepath)
+        slug = get_slug()
 
         for check_name, check in checks.items():
             if self.on_save and check_name == "unsaved":

@@ -7,17 +7,42 @@ from shutil import rmtree
 from ..utils.filename_utils import get_map_name, get_slug
 
 
+def select_objects_in_collection(collection, depth=0):
+    """Recursively select all objects in the given collection."""
+    if depth == 0:
+        # First time, deselect all objects
+        for obj in bpy.data.objects:
+            try:
+                obj.select_set(False)
+            except RuntimeError:
+                print(f"ERROR: Failed to deselect object {obj.name}. It may not be selectable.")
+                continue
+    elif depth > 100:
+        print("ERROR: Too deep recursion in select_objects_in_collection, aborting to prevent infinite loop.")
+        return
+    print(f"Selecting objects in collection: {collection.name}")
+    for obj in collection.objects:
+        try:
+            obj.select_set(True)
+        except RuntimeError:
+            print(f"ERROR: Failed to deselect object {obj.name}. It may not be selectable.")
+            continue
+    for child_collection in collection.children:
+        select_objects_in_collection(child_collection, depth + 1)
+
+
 def export_model(cls, context, slug, gltf_file):
     if f"{slug}_LOD0" in bpy.data.collections:
         collection = bpy.data.collections[f"{slug}_LOD0"]
+    elif f"{slug}_static" in bpy.data.collections:
+        collection = bpy.data.collections[f"{slug}_static"]
     elif slug in bpy.data.collections:
         collection = bpy.data.collections[slug]
     else:
         cls.report({"ERROR"}, "No collection named " + slug)
         return {"CANCELLED"}
 
-    for o in bpy.data.objects:
-        o.select_set(o in list(collection.objects))
+    select_objects_in_collection(collection)
 
     if context.scene.hat_props.asset_type == "model":
         bpy.ops.export_scene.gltf(

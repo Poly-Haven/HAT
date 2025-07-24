@@ -16,6 +16,9 @@
       "120"
   ],
   "python.linting.flake8Enabled": true,
+  "python.analysis.diagnosticSeverityOverrides": {
+      "reportInvalidTypeForm": "none"
+  },
   "files.exclude": {
       "**/__pycache__": true,
       ".idea": true,

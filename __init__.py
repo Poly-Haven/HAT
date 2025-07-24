@@ -33,6 +33,9 @@ class HATProperties(bpy.types.PropertyGroup):
     expand_result_docs: bpy.props.BoolProperty(
         name="Toggle", description="Show/hide info explaining the type test results you may see", default=False
     )
+    latest_tests: bpy.props.StringProperty(
+        name="Latest Tests", description="The results of the latest tests run on this asset", options={"HIDDEN"}
+    )
 
 
 # Remember what shading type each space used to restore after saving

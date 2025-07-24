@@ -1,8 +1,11 @@
 import bpy
+import json
 from ..operators import check
 from ..operators import export_gltf
 from ..operators import fix_img_db_name
 from ..operators import scrub_datablocks
+from ..utils.filename_utils import get_slug
+from ..utils.draw_message_label import draw_message_label
 from .. import icons
 
 
@@ -29,7 +32,6 @@ class HAT_PT_main(bpy.types.Panel):
 
     def draw(self, context):
         props = context.scene.hat_props
-        i = icons.get_icons()
 
         col = self.layout.column(align=True)
         row = col.row()
@@ -38,27 +40,42 @@ class HAT_PT_main(bpy.types.Panel):
         sub.alignment = "RIGHT"
         sub.prop(props, "test_on_save", icon="CHECKBOX_HLT" if props.test_on_save else "CHECKBOX_DEHLT", toggle=True)
 
-        col.separator()
-        box = col.box()
-        sub = box.column(align=True)
-        sub.scale_y = 0.9
-        row = sub.row()
-        row.label(text="Understanding test results:")
-        row.prop(
-            props,
-            "expand_result_docs",
-            text="",
-            toggle=True,
-            emboss=False,
-            icon="DOWNARROW_HLT" if props.expand_result_docs else "RIGHTARROW",
-        )
-        if props.expand_result_docs:
-            sub.label(text="Successful test", icon="CHECKMARK")
-            sub.label(text="Question - something suspicious, but could be fine", icon_value=i["question"].icon_id)
-            sub.label(
-                text="Warning - possible issue, needs investigation", icon_value=i["exclamation-triangle"].icon_id
-            )
-            sub.label(text="Error - definite issue that needs to be fixed", icon_value=i["x-circle-fill"].icon_id)
+
+class HAT_PT_results(bpy.types.Panel):
+    bl_label = "Test Results"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "scene"
+    bl_parent_id = "HAT_PT_main"
+
+    @classmethod
+    def poll(self, context):
+        return context.scene.hat_props.latest_tests != ""
+
+    def draw(self, context):
+        props = context.scene.hat_props
+        col = self.layout.column()
+        if props.latest_tests:
+            try:
+                tests = json.loads(props.latest_tests)
+                for status, messages in tests:
+                    for message in messages:
+                        if message != "File contains unsaved changes":
+                            draw_message_label(col, message, status)
+            except json.JSONDecodeError:
+                col.label(text="Failed to decode latest tests JSON.", icon="ERROR")
+
+
+class HAT_PT_info(bpy.types.Panel):
+    bl_label = "Info"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "scene"
+    bl_parent_id = "HAT_PT_main"
+
+    def draw(self, context):
+        col = self.layout.column()
+        col.label(text=f"Detected Slug: {get_slug()}")
 
 
 class HAT_PT_tools(bpy.types.Panel):

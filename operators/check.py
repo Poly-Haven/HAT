@@ -1,9 +1,10 @@
 import importlib
+import json
 import os
 import sys
 from ..utils import dpi_factor
 from ..utils.filename_utils import get_slug
-from .. import icons
+from ..utils.draw_message_label import draw_message_label
 
 check_list = (
     os.path.splitext(f)[0] for f in os.listdir(os.path.join(os.path.dirname(__file__), "checks")) if f.endswith(".py")
@@ -35,24 +36,12 @@ class HAT_OT_check(bpy.types.Operator):
         return bpy.data.is_saved
 
     def draw(self, context):
-        i = icons.get_icons()
-        status_icon_custom = {
-            "ERROR": "x-circle-fill",
-            "WARNING": "exclamation-triangle",
-            "QUESTION": "question",
-        }
-        status_icon = {
-            "SUCCESS": "CHECKMARK",
-        }
         col = self.layout.column(align=True)
         for status, messages in self.tests:
             if status == "SUCCESS" and self.on_save:
                 continue
             for message in messages:
-                if status in status_icon_custom:
-                    col.label(text=message, icon_value=i[status_icon_custom[status]].icon_id)
-                else:
-                    col.label(text=message, icon=status_icon[status])
+                draw_message_label(col, message, status)
         if self.on_save:
             row = col.row()
             row.alignment = "RIGHT"
@@ -74,6 +63,19 @@ class HAT_OT_check(bpy.types.Operator):
                 # No need to check for unsaved changes while we're busy saving.
                 continue
             self.tests.append(check.check(slug))
+
+        all_success = True
+        for status, messages in self.tests:
+            if status != "SUCCESS":
+                for message in messages:
+                    if message != "File contains unsaved changes":
+                        all_success = False
+                        break
+        if all_success:
+            self.tests.append(["SUCCESS", ["All checks passed!"]])
+
+        # Store tests in scene prop
+        context.scene.hat_props.latest_tests = json.dumps(self.tests)
 
         if self.on_save:
             failed_tests = list((t for t in self.tests if t[0] != "SUCCESS"))

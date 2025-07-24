@@ -60,6 +60,16 @@ class HAT_PT_main(bpy.types.Panel):
             )
             sub.label(text="Error - definite issue that needs to be fixed", icon_value=i["x-circle-fill"].icon_id)
 
+
+class HAT_PT_tools(bpy.types.Panel):
+    bl_label = "Tools"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "scene"
+    bl_parent_id = "HAT_PT_main"
+
+    def draw(self, context):
+        props = context.scene.hat_props
         col = self.layout.column()
         col.operator(scrub_datablocks.HAT_OT_scrub_datablocks.bl_idname, icon="TRASH")
         col.operator(fix_img_db_name.HAT_OT_fix_img_db_name.bl_idname, icon="COPY_ID")

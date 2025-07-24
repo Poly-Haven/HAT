@@ -17,7 +17,7 @@ class HATProperties(bpy.types.PropertyGroup):
     asset_type: bpy.props.EnumProperty(
         name="Asset Type",
         description="What type of asset is this?",
-        default="model",
+        default="texture",
         items=(
             ("model", "Model", "A 3D model to be published on polyhaven.com"),
             ("texture", "Texture", "A texture to be published on polyhaven.com"),

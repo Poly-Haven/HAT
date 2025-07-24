@@ -74,8 +74,27 @@ class HAT_PT_info(bpy.types.Panel):
     bl_parent_id = "HAT_PT_main"
 
     def draw(self, context):
-        col = self.layout.column()
-        col.label(text=f"Detected Slug: {get_slug()}")
+        props = context.scene.hat_props
+        slug = get_slug()
+        col = self.layout.column(align=True)
+        col.label(text=f"Detected Slug: {slug}")
+        if props.asset_type == "texture":
+            plane = bpy.data.objects.get("Plane")
+            if plane:
+                col.label(text=f"Dimensions: {plane.dimensions.x:.1f}m x {plane.dimensions.y:.1f}m")
+            else:
+                col.label(text='No "Plane" found in the scene.', icon="ERROR")
+            material = bpy.data.materials.get(slug)
+            if material:
+                try:
+                    disp_node = material.node_tree.nodes["Displacement"]
+                    col.label(text=f"Displacement Scale: {disp_node.inputs['Scale'].default_value * 1000:.0f}mm")
+                except KeyError:
+                    col.label(text="No displacement node found", icon="ERROR")
+                except AttributeError:
+                    col.label(text="Material does not have a node tree.", icon="ERROR")
+            else:
+                col.label(text=f'No material named "{slug}" found.', icon="ERROR")
 
 
 class HAT_PT_tools(bpy.types.Panel):

@@ -47,7 +47,4 @@ def check(slug):
                     result = "ERROR"
                     messages.append(bpy.path.basename(img.filepath) + " isn't sRGB")
 
-    if result == "SUCCESS":
-        messages = ["All data texture maps are in the correct color space"]
-
     return result, messages

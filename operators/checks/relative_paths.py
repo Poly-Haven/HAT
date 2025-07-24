@@ -7,12 +7,8 @@ def check(slug):
 
     textures = fetch_textures()
     for image in textures:
-        if not image.filepath.startswith('//textures'):
-            result = 'ERROR'
-            messages.append(
-                f'{image.name} path doesn\'t start with //textures')
-
-    if result == "SUCCESS":
-        messages = ["Texture paths are relative"]
+        if not image.filepath.startswith("//textures"):
+            result = "ERROR"
+            messages.append(f"{image.name} path doesn't start with //textures")
 
     return result, messages

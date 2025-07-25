@@ -2,6 +2,19 @@ import bpy
 
 
 def check(slug):
+    result = "SUCCESS"
+    messages = []
+
     if bpy.context.scene.unit_settings.scale_length != 1:
-        return 'ERROR', ["Scene Unit Scale is not 1.0"]
-    return 'SUCCESS', []
+        result = "ERROR"
+        messages.append("Scene Unit Scale is not 1.0")
+
+    if bpy.context.scene.unit_settings.length_unit != "METERS":
+        result = "ERROR"
+        messages.append("Scene Unit Length is not Meters")
+
+    if bpy.context.scene.unit_settings.system != "METRIC":
+        result = "ERROR"
+        messages.append("Scene Unit System is not Metric")
+
+    return result, messages

@@ -29,8 +29,8 @@ Checks:
 * [x] Slug naming convention
 * [x] Warning if file has unsaved changes
 * [x] Object origin is not (0,0,0)
-* [ ] Only one scene and viewlayer
-* [ ] Make sure units are in meters
+* [x] Only one scene and viewlayer
+* [x] Make sure units are in meters
 * [ ] Warn if shapekeys exist which may cause issues for gltf export
 * [ ] Main collection is visible and renderable
 

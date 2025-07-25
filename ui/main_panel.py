@@ -74,14 +74,33 @@ class HAT_PT_info(bpy.types.Panel):
     bl_parent_id = "HAT_PT_main"
 
     def draw(self, context):
+        i = icons.get_icons()
         props = context.scene.hat_props
         slug = get_slug()
         col = self.layout.column(align=True)
-        col.label(text=f"Detected Slug: {slug}")
+
+        # Slug
+        row = col.row()
+        row.alignment = "LEFT"
+        row.label(text=f"Detected Slug: {slug}")
+        row.operator("wm.url_open", text="", icon="VIEWZOOM").url = f"https://polyhaven.com/tools/slug-check?s={slug}"
+
+        # Texture info
         if props.asset_type == "texture":
             plane = bpy.data.objects.get("Plane")
             if plane:
-                col.label(text=f"Dimensions: {plane.dimensions.x:.1f}m x {plane.dimensions.y:.1f}m")
+                min_dimension = 1.8
+                row = col.row()
+                row.alignment = "LEFT"
+                row.label(
+                    text=f"Dimensions: {plane.dimensions.x:.1f}m x {plane.dimensions.y:.1f}m",
+                    icon_value=(
+                        i["exclamation-triangle"].icon_id
+                        if plane.dimensions.x < min_dimension or plane.dimensions.y < min_dimension
+                        else 0
+                    ),
+                )
+                row.operator("hat.refresh", text="", icon="FILE_REFRESH", emboss=False)
             else:
                 col.label(text='No "Plane" found in the scene.', icon="ERROR")
             material = bpy.data.materials.get(slug)

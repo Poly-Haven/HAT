@@ -2,6 +2,7 @@ import bpy
 
 
 def check(slug):
+    """Material names should match the asset slug"""
     result = "SUCCESS"
     messages = []
 

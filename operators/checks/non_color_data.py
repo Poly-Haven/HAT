@@ -3,6 +3,7 @@ from ...utils import filename_utils
 
 
 def check(slug):
+    """Texture maps use appropriate color space settings (Non-Color Data when required)"""
     result = "SUCCESS"
     messages = []
 

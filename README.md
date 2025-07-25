@@ -1,5 +1,5 @@
 # HAT
-Haven Asset Tester - A Blender add-on we use for asset QC
+Haven Asset Tester - A Blender add-on we use for texture and model QC
 
 ## How to install:
 
@@ -9,29 +9,41 @@ Add the following URL as a new Remote Repository extension in Blender:
 
 Search for the HAT extension and click Install.
 
-## Features / to do:
+## Features:
 
 Checks:
 
-* [x] Check maps use Non-color Data when required
-* [x] Check if vertex colors exist (will screw up gltf export)
-* [x] Unit Scale is 1.0
-* [x] Warning if scale is not applied
-* [x] Collection name should be same as slug (file name)
-* [x] Texture file names should start with slug
-* [x] Texture datablock should match file name
-* [x] Texture files exist
-* [x] Texture map names should be standardized
-* [x] No packed texture files
-* [x] Material names should match or start with slug
-* [x] Texture paths should all be relative
-* [x] Texture "Plane" object is default dimensions
-* [x] Slug naming convention
-* [x] Warning if file has unsaved changes
-* [x] Object origin is not (0,0,0)
-* [x] Only one scene and viewlayer
-* [x] Make sure units are in meters
-* [x] Warn if shapekeys exist which may cause issues for gltf export
+<!-- This list is auto-generated from docstrings in operators/checks/*.py files.
+     Run 'python build_readme_checklist.py' to update. -->
+
+* [x] All objects have applied scale (1.0) to ensure no unexpected behaviour
+* [x] Blender version is the latest official release
+* [x] Model collection name should match the asset slug
+* [x] Texture datablock names should match their file names
+* [x] File size is within acceptable limits for the asset type
+* [x] All referenced texture files exist on disk
+* [x] Geometry nodes collections are properly structured with LOD0 or static collections
+* [x] LOD (Level of Detail) collections and objects are properly structured
+* [x] Texture map names follow standardized naming conventions
+* [x] Material IOR (Index of Refraction) values are not set to 0
+* [x] Material names should match the asset slug
+* [x] No world or HDRI data blocks should be present in the asset
+* [x] Texture maps use appropriate color space settings (Non-Color Data when required)
+* [x] Objects should be at the origin
+* [x] File should contain only one scene and one view layer
+* [x] No orphaned data blocks (unused data) should be present
+* [x] No texture files should be packed into the blend file
+* [x] All texture paths should be relative and point to the textures folder
+* [x] All texture resolutions should match within the asset
+* [x] Objects should not have shape keys which may cause issues for GLTF export
+* [x] Asset slug follows proper naming conventions (lowercase, allowed characters only)
+* [x] Texture preview plane has non-default dimensions
+* [x] Texture file names should start with the asset slug and follow naming conventions
+* [x] Scene unit scale is set to 1.0 meters
+* [x] Objects should not have vertex colors which may break GLTF export
+
+To do:
+
 * [ ] Main collection is visible and renderable
 
 Tools:

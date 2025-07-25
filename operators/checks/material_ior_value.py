@@ -2,6 +2,7 @@ import bpy
 
 
 def check(slug):
+    """Material IOR (Index of Refraction) values are not set to 0"""
     result = "SUCCESS"
     messages = []
 

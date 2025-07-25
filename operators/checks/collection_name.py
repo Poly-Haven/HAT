@@ -2,6 +2,7 @@ import bpy
 
 
 def check(slug):
+    """Model collection name should match the asset slug"""
     result = "SUCCESS"
     messages = []
 

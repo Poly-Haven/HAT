@@ -3,6 +3,7 @@ import requests
 
 
 def check(slug):
+    """Blender version is the latest official release"""
     result = "SUCCESS"
     messages = []
 

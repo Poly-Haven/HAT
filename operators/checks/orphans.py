@@ -1,8 +1,8 @@
-from xmlrpc.client import DateTime
 import bpy
 
 
 def check(slug):
+    """No orphaned data blocks (unused data) should be present"""
     result = "SUCCESS"
     messages = []
 

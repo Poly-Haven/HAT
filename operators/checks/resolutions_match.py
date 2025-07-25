@@ -2,6 +2,7 @@ from ...utils.fetch_textures import fetch_textures
 
 
 def check(slug):
+    """All texture resolutions should match within the asset"""
     result = "SUCCESS"
     messages = []
 

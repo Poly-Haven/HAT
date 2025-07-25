@@ -2,6 +2,7 @@ import bpy
 
 
 def check(slug):
+    """LOD (Level of Detail) collections and objects are properly structured"""
     result = "SUCCESS"
     messages = []
 

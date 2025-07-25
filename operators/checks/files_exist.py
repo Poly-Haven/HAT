@@ -3,6 +3,7 @@ import os
 
 
 def check(slug):
+    """All referenced texture files exist on disk"""
     result = "SUCCESS"
     messages = []
 

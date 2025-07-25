@@ -2,6 +2,7 @@ import bpy
 
 
 def check(slug):
+    """Scene unit scale is set to 1.0 meters"""
     result = "SUCCESS"
     messages = []
 

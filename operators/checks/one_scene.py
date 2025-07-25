@@ -2,6 +2,7 @@ import bpy
 
 
 def check(slug):
+    """File should contain only one scene and one view layer"""
     result = "SUCCESS"
     messages = []
 

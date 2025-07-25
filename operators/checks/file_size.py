@@ -3,6 +3,7 @@ import os
 
 
 def check(slug):
+    """File size is within acceptable limits for the asset type"""
     result = "SUCCESS"
     messages = []
 

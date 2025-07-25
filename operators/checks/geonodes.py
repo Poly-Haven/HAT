@@ -2,6 +2,7 @@ import bpy
 
 
 def check(slug):
+    """Geometry nodes collections are properly structured with LOD0 or static collections"""
     result = "SUCCESS"
     messages = []
 

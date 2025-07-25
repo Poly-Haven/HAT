@@ -1,5 +1,6 @@
 @echo off
 rm index.json
+python build_readme_checklist.py
 blender --factory-startup --command extension build
 blender --factory-startup --command extension server-generate --repo-dir=.
 

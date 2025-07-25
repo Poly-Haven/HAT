@@ -2,6 +2,7 @@ import bpy
 
 
 def check(slug):
+    """No world or HDRI data blocks should be present in the asset"""
     result = "SUCCESS"
     messages = []
 

@@ -2,6 +2,7 @@ import bpy
 
 
 def check(slug):
+    """Texture datablock names should match their file names"""
     result = "SUCCESS"
     messages = []
 
@@ -11,6 +12,6 @@ def check(slug):
         fn = bpy.path.basename(img.filepath)
         if fn != img.name:
             result = "WARNING"
-            messages.append(f'Image \'{img.name}\' has different filename')
+            messages.append(f"Image '{img.name}' has different filename")
 
     return result, messages

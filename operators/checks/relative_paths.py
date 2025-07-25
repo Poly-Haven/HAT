@@ -3,6 +3,7 @@ from ...utils.fetch_textures import fetch_textures
 
 
 def check(slug):
+    """All texture paths should be relative and point to the textures folder"""
     result = "SUCCESS"
     messages = []
 

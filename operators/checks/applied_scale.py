@@ -3,6 +3,7 @@ from mathutils import Vector
 
 
 def check(slug):
+    """All objects have applied scale (1.0) to ensure no unexpected behaviour"""
     result = "SUCCESS"
     messages = []
 

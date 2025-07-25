@@ -2,6 +2,7 @@ import bpy
 
 
 def check(slug):
+    """Objects should not have shape keys which may cause issues for GLTF export"""
     result = "SUCCESS"
     messages = []
 

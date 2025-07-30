@@ -1,5 +1,6 @@
 import bpy
 import json
+from ..operators import change_slug
 from ..operators import check
 from ..operators import export_gltf
 from ..operators import fix_img_db_name
@@ -126,6 +127,8 @@ class HAT_PT_tools(bpy.types.Panel):
     def draw(self, context):
         props = context.scene.hat_props
         col = self.layout.column()
+        col.operator(change_slug.HAT_OT_change_slug.bl_idname, icon="OUTLINER_OB_FONT")
+        col.separator()
         col.operator(scrub_datablocks.HAT_OT_scrub_datablocks.bl_idname, icon="TRASH")
         col.operator(fix_img_db_name.HAT_OT_fix_img_db_name.bl_idname, icon="COPY_ID")
 

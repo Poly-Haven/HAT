@@ -1,4 +1,5 @@
 if "bpy" not in locals():
+    from . import change_slug
     from . import check
     from . import export_gltf
     from . import fix_img_db_name
@@ -7,15 +8,15 @@ if "bpy" not in locals():
 else:
     import importlib
 
+    importlib.reload(change_slug)
     importlib.reload(check)
     importlib.reload(export_gltf)
     importlib.reload(fix_img_db_name)
     importlib.reload(refresh)
     importlib.reload(scrub_datablocks)
 
-import bpy
-
 classes = [
+    change_slug.HAT_OT_change_slug,
     check.HAT_OT_check,
     export_gltf.HAT_OT_export_gltf,
     fix_img_db_name.HAT_OT_fix_img_db_name,

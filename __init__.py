@@ -10,7 +10,10 @@ else:
     imp.reload(icons)
 
 import bpy
+import logging
 from bpy.app.handlers import persistent
+
+log = logging.getLogger(__name__)
 
 
 class HATProperties(bpy.types.PropertyGroup):

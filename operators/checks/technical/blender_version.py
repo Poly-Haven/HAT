@@ -1,5 +1,8 @@
 import bpy
 import requests
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def check(slug):
@@ -17,13 +20,13 @@ def check(slug):
     except requests.RequestException as e:
         result = "WARNING"
         messages.append("Failed to retrieve Blender version from PH Admin server: " + str(e))
-        print("Error fetching Blender version:", e)
+        log.error("Error fetching Blender version: %s", e)
         return result, messages
 
     if server_version == "unknown":
         result = "WARNING"
         messages.append("Unknown Blender version from PH Admin server, please tell Greg :(")
-        print("Unknown Blender version from PH Admin server; data:", data)
+        log.error("Unknown Blender version from PH Admin server; data: %s", data)
         return result, messages
 
     current_version = bpy.app.version_string

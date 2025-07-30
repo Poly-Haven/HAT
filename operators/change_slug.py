@@ -1,4 +1,5 @@
 import bpy
+import logging
 import time
 from bpy.props import StringProperty
 from bpy.types import Operator
@@ -6,10 +7,12 @@ from pathlib import Path
 from ..utils.filename_utils import get_slug
 from .. import icons
 
+log = logging.getLogger(__name__)
+
 
 def find_datablocks_with_slug(slug, max_depth=3):
     """Find all datablocks that start with the slug - generic future-proof version"""
-    print(f"DEBUG: Starting search for datablocks with slug: '{slug}'")
+    log.debug(f"Starting search for datablocks with slug: '{slug}'")
     start_time = time.time()
     max_search_time = 10.0  # Maximum 10 seconds to prevent hanging
     affected_datablocks = []
@@ -45,17 +48,17 @@ def find_datablocks_with_slug(slug, max_depth=3):
         except (AttributeError, TypeError):
             continue
 
-    print(f"DEBUG: Discovered {len(discovered_data_types)} data types: {discovered_data_types}")
+    log.debug(f"Discovered {len(discovered_data_types)} data types: {discovered_data_types}")
 
     for data_type in discovered_data_types:
         # Check time limit
         if time.time() - start_time > max_search_time:
-            print(f"DEBUG: Time limit exceeded ({max_search_time}s), stopping search")
+            log.debug(f"Time limit exceeded ({max_search_time}s), stopping search")
             break
 
         try:
             container = getattr(bpy.data, data_type)
-            print(f"DEBUG: Searching bpy.data.{data_type}")
+            log.debug(f"Searching bpy.data.{data_type}")
 
             # Additional safety check - make sure container is actually iterable and has items
             if not hasattr(container, "__iter__"):
@@ -66,7 +69,7 @@ def find_datablocks_with_slug(slug, max_depth=3):
                 container_len = len(container)
                 if container_len == 0:
                     continue
-                print(f"DEBUG: {data_type} has {container_len} items")
+                log.debug(f"{data_type} has {container_len} items")
             except (TypeError, AttributeError):
                 # Some containers might not support len(), that's ok
                 pass
@@ -79,19 +82,19 @@ def find_datablocks_with_slug(slug, max_depth=3):
                 for item in container:
                     item_count += 1
                     if item_count > max_items_per_container:
-                        print(f"DEBUG: Hit safety limit of {max_items_per_container} items in {data_type}")
+                        log.debug(f"Hit safety limit of {max_items_per_container} items in {data_type}")
                         break
 
                     # Additional time check inside loop for very large containers
                     if item_count % 1000 == 0 and time.time() - start_time > max_search_time:
-                        print(f"DEBUG: Time limit exceeded during {data_type} search")
+                        log.debug(f"Time limit exceeded during {data_type} search")
                         break
 
                     # Check if item has a name attribute and starts with slug
                     if hasattr(item, "name") and hasattr(item.name, "startswith"):
                         try:
                             if item.name.startswith(slug):
-                                print(f"DEBUG: Found datablock: {data_type}.{item.name}")
+                                log.debug(f"Found datablock: {data_type}.{item.name}")
                                 affected_datablocks.append({"type": data_type, "name": item.name, "object": item})
                         except (AttributeError, TypeError):
                             # Some objects might have non-string names or other issues
@@ -99,29 +102,28 @@ def find_datablocks_with_slug(slug, max_depth=3):
 
             except (TypeError, AttributeError):
                 # Container might not be properly iterable
-                print(f"DEBUG: Container {data_type} is not properly iterable")
+                log.debug(f"Container {data_type} is not properly iterable")
                 continue
 
         except Exception as e:
-            print(f"DEBUG: Error accessing bpy.data.{data_type}: {e}")
+            log.debug(f"Error accessing bpy.data.{data_type}: {e}")
             continue
 
     elapsed_time = time.time() - start_time
-    print(
-        f"DEBUG: Search completed in {elapsed_time:.2f}s. "
-        f"Found {len(affected_datablocks)} datablocks with slug '{slug}'"
+    log.debug(
+        f"Search completed in {elapsed_time:.2f}s. " f"Found {len(affected_datablocks)} datablocks with slug '{slug}'"
     )
     return affected_datablocks
 
 
 def find_texture_files_with_slug(slug):
     """Find all texture files in the textures folder that start with the slug"""
-    print(f"DEBUG: Finding texture files with slug '{slug}'")
+    log.debug(f"Finding texture files with slug '{slug}'")
     affected_files = []
 
     blend_filepath = bpy.data.filepath
     if not blend_filepath:
-        print("DEBUG: No blend file path available")
+        log.debug("No blend file path available")
         return affected_files
 
     # Look for textures folder next to the blend file
@@ -129,26 +131,26 @@ def find_texture_files_with_slug(slug):
     textures_dir = blend_path.parent / "textures"
 
     if not textures_dir.exists():
-        print(f"DEBUG: No textures folder found at {textures_dir}")
+        log.debug(f"No textures folder found at {textures_dir}")
         return affected_files
 
     if not textures_dir.is_dir():
-        print(f"DEBUG: {textures_dir} exists but is not a directory")
+        log.debug(f"{textures_dir} exists but is not a directory")
         return affected_files
 
-    print(f"DEBUG: Searching textures folder: {textures_dir}")
+    log.debug(f"Searching textures folder: {textures_dir}")
 
     try:
         for filepath in textures_dir.iterdir():
             # Only process files (not subdirectories)
             if filepath.is_file() and filepath.name.startswith(slug):
-                print(f"DEBUG: Found matching texture file: {filepath.name}")
+                log.debug(f"Found matching texture file: {filepath.name}")
                 affected_files.append(str(filepath))
 
     except Exception as e:
-        print(f"DEBUG: Error reading textures directory: {e}")
+        log.debug(f"Error reading textures directory: {e}")
 
-    print(f"DEBUG: Found {len(affected_files)} texture files with slug '{slug}'")
+    log.debug(f"Found {len(affected_files)} texture files with slug '{slug}'")
     return affected_files
 
 
@@ -186,40 +188,40 @@ def rename_image_file(filepath, old_slug, new_slug):
 
 def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
     """Change the asset slug, in all locations where it is necessary"""
-    print(f"DEBUG: change_texture_slug called with old_slug='{old_slug}', new_slug='{new_slug}', dry_run={dry_run}")
+    log.debug(f"change_texture_slug called with old_slug='{old_slug}', new_slug='{new_slug}', dry_run={dry_run}")
 
     if not old_slug or not new_slug:
-        print("DEBUG: Empty slug provided, returning empty actions")
+        log.debug("Empty slug provided, returning empty actions")
         return []
 
     actions = []
 
     # 1. Find texture files to rename
-    print("DEBUG: Step 1 - Finding texture files")
+    log.debug("Step 1 - Finding texture files")
     texture_files = find_texture_files_with_slug(old_slug)
     for filepath in texture_files:
         old_path, new_path = rename_image_file(filepath, old_slug, new_slug)
         if old_path != new_path:
-            print(f"DEBUG: Will rename texture: {Path(old_path).name} -> {Path(new_path).name}")
+            log.debug(f"Will rename texture: {Path(old_path).name} -> {Path(new_path).name}")
 
             # Check if target file already exists during dry run
             has_conflict = dry_run and Path(new_path).exists()
             if has_conflict:
-                print(f"DEBUG: WARNING - Target file already exists: {new_path}")
+                log.debug(f"WARNING - Target file already exists: {new_path}")
 
             actions.append(
                 {"type": "rename_image_file", "old_path": old_path, "new_path": new_path, "has_conflict": has_conflict}
             )
 
     # 2. Find datablocks to rename
-    print(f"DEBUG: Step 2 - Finding datablocks with slug '{old_slug}'")
+    log.debug(f"Step 2 - Finding datablocks with slug '{old_slug}'")
 
     # TEMPORARY: Disable datablock search to test if this is causing the freeze
     # Uncomment the line below to re-enable datablock search
     datablocks = find_datablocks_with_slug(old_slug)
     # datablocks = []  # Disable datablock search temporarily
 
-    print(f"DEBUG: Found {len(datablocks)} datablocks")
+    log.debug(f"Found {len(datablocks)} datablocks")
 
     for datablock_info in datablocks:
         old_name = datablock_info["name"]
@@ -239,7 +241,7 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
                     container = getattr(bpy.data, datablock_info["type"])
                     has_conflict = new_name in container
                     if has_conflict:
-                        print(f"DEBUG: WARNING - Datablock name conflict: {datablock_info['type']}.{new_name} exists")
+                        log.debug(f"WARNING - Datablock name conflict: {datablock_info['type']}.{new_name} exists")
 
                 actions.append(
                     {
@@ -253,12 +255,12 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
                 )
 
     # 3. Find blend file and parent folder rename actions (done last)
-    print("DEBUG: Step 3 - Checking blend file and parent folder")
+    log.debug("Step 3 - Checking blend file and parent folder")
     blend_filepath = bpy.data.filepath
     if blend_filepath:
         blend_path = Path(blend_filepath)
         blend_filename = blend_path.name
-        print(f"DEBUG: Blend filename: {blend_filename}")
+        log.debug(f"Blend filename: {blend_filename}")
 
         if blend_filename.startswith(old_slug):
             new_filename = new_slug + blend_filename[len(old_slug) :]
@@ -268,17 +270,17 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
             backup_filename = new_slug + blend_filename[len(old_slug) :].replace(".blend", ".blend1")
             backup_filepath = blend_path.parent / backup_filename
 
-            print(f"DEBUG: Will rename blend file: {blend_filename} -> {new_filename}")
-            print(f"DEBUG: Will create backup: {blend_filename} -> {backup_filename}")
+            log.debug(f"Will rename blend file: {blend_filename} -> {new_filename}")
+            log.debug(f"Will create backup: {blend_filename} -> {backup_filename}")
 
             # Check for conflicts during dry run
             blend_conflict = dry_run and new_blend_filepath.exists()
             backup_conflict = dry_run and backup_filepath.exists()
 
             if blend_conflict:
-                print(f"DEBUG: WARNING - Target blend file already exists: {new_blend_filepath}")
+                log.debug(f"WARNING - Target blend file already exists: {new_blend_filepath}")
             if backup_conflict:
-                print(f"DEBUG: WARNING - Backup file already exists: {backup_filepath}")
+                log.debug(f"WARNING - Backup file already exists: {backup_filepath}")
 
             actions.append(
                 {
@@ -293,17 +295,17 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
         # Check if parent folder should be renamed
         parent_dir = blend_path.parent.parent
         current_folder_name = blend_path.parent.name
-        print(f"DEBUG: Current folder name: {current_folder_name}")
+        log.debug(f"Current folder name: {current_folder_name}")
 
         if current_folder_name == old_slug:
             new_folder_name = new_slug
             new_folder_path = parent_dir / new_folder_name
-            print(f"DEBUG: Will rename parent folder: {current_folder_name} -> {new_folder_name}")
+            log.debug(f"Will rename parent folder: {current_folder_name} -> {new_folder_name}")
 
             # Check for conflicts during dry run
             folder_conflict = dry_run and new_folder_path.exists()
             if folder_conflict:
-                print(f"DEBUG: WARNING - Target folder already exists: {new_folder_path}")
+                log.debug(f"WARNING - Target folder already exists: {new_folder_path}")
 
             actions.append(
                 {
@@ -325,19 +327,19 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
                     new_path = Path(action["new_path"])
 
                     old_path.rename(backup_path)
-                    print(f"DEBUG: Created backup: {backup_path.name}")
+                    log.debug(f"Created backup: {backup_path.name}")
                     # Save as new filename
                     if "rename_parent_folder" not in [a["type"] for a in actions]:
                         bpy.ops.wm.save_as_mainfile(filepath=str(new_path), relative_remap=False)
-                        print(f"DEBUG: Saved as: {new_path.name}")
+                        log.debug(f"Saved as: {new_path.name}")
                 elif action["type"] == "rename_parent_folder":
                     try:
                         old_path = Path(action["old_path"])
                         new_path = Path(action["new_path"])
                         old_path.rename(new_path)
-                        print(f"DEBUG: Renamed folder: {old_path.name} -> {new_path.name}")
+                        log.debug(f"Renamed folder: {old_path.name} -> {new_path.name}")
                     except Exception as e:
-                        print(f"DEBUG: Error renaming folder {action['old_path']} to {action['new_path']}: {e}")
+                        log.error(f"Error renaming folder {action['old_path']} to {action['new_path']}: {e}")
                         cls.report({"ERROR"}, f"Failed to rename folder: {e}")
                         bpy.ops.wm.save_mainfile(relative_remap=False)  # Save without changing path
                         continue
@@ -345,12 +347,12 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
                         filepath=str(new_path / f"{new_slug}.blend"),
                         relative_remap=False,
                     )
-                    print(f"DEBUG: Saved as: {new_path.name}")
+                    log.debug(f"Saved as: {new_path.name}")
                 elif action["type"] == "rename_image_file":
                     old_path = Path(action["old_path"])
                     new_path = Path(action["new_path"])
                     old_path.rename(new_path)
-                    print(f"DEBUG: Renamed texture: {old_path.name} -> {new_path.name}")
+                    log.debug(f"Renamed texture: {old_path.name} -> {new_path.name}")
 
                     # Update image datablocks that reference this file
                     # Use absolute paths for comparison but keep original path format
@@ -390,17 +392,17 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
                                 else:
                                     img.filepath = new_basename
 
-                                print(f"DEBUG: Updated image datablock filepath: {img.name} -> {img.filepath}")
+                                log.debug(f"Updated image datablock filepath: {img.name} -> {img.filepath}")
                 elif action["type"] == "rename_datablock":
                     # Actually rename the datablock during execution
                     datablock = action["object"]
                     datablock.name = action["new_name"]
-                    print(f"DEBUG: Renamed datablock {action['old_name']} -> {action['new_name']}")
+                    log.debug(f"Renamed datablock {action['old_name']} -> {action['new_name']}")
             except Exception as e:
-                print(f"DEBUG: Error executing action {action}: {e}")
+                log.error(f"Error executing action {action}: {e}")
                 cls.report({"ERROR"}, f"Failed to execute action: {e}")
 
-    print(f"DEBUG: change_texture_slug completed. Total actions: {len(actions)}")
+    log.debug(f"change_texture_slug completed. Total actions: {len(actions)}")
     return actions
 
 

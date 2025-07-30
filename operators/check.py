@@ -1,10 +1,13 @@
 import importlib
 import json
+import logging
 import os
 import sys
 from ..utils import dpi_factor
 from ..utils.filename_utils import get_slug
 from ..utils.draw_message_label import draw_message_label
+
+log = logging.getLogger(__name__)
 
 
 def discover_checks():
@@ -39,7 +42,7 @@ def discover_checks():
                         importlib.reload(m)
                     check_modules[check_name] = m
                 except (ImportError, KeyError) as e:
-                    print(f"Failed to load check module {module_path}: {e}")
+                    log.error(f"Failed to load check module {module_path}: {e}")
 
     return check_modules
 

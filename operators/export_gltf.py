@@ -1,10 +1,13 @@
 import bmesh
 import bpy
 import json
+import logging
 import mathutils
 import os
 from shutil import rmtree
 from ..utils.filename_utils import get_map_name, get_slug
+
+log = logging.getLogger(__name__)
 
 
 def select_objects_in_collection(collection, depth=0):
@@ -15,17 +18,17 @@ def select_objects_in_collection(collection, depth=0):
             try:
                 obj.select_set(False)
             except RuntimeError:
-                print(f"ERROR: Failed to deselect object {obj.name}. It may not be selectable.")
+                log.error("Failed to deselect object %s. It may not be selectable.", obj.name)
                 continue
     elif depth > 100:
-        print("ERROR: Too deep recursion in select_objects_in_collection, aborting to prevent infinite loop.")
+        log.error("Too deep recursion in select_objects_in_collection, aborting to prevent infinite loop.")
         return
-    print(f"Selecting objects in collection: {collection.name}")
+    log.debug("Selecting objects in collection: %s", collection.name)
     for obj in collection.objects:
         try:
             obj.select_set(True)
         except RuntimeError:
-            print(f"ERROR: Failed to deselect object {obj.name}. It may not be selectable.")
+            log.error("Failed to select object %s. It may not be selectable.", obj.name)
             continue
     for child_collection in collection.children:
         select_objects_in_collection(child_collection, depth + 1)

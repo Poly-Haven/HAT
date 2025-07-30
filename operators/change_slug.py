@@ -1,8 +1,8 @@
 import bpy
-import os
 import time
 from bpy.props import StringProperty
 from bpy.types import Operator
+from pathlib import Path
 from ..utils.filename_utils import get_slug
 from .. import icons
 
@@ -125,27 +125,25 @@ def find_texture_files_with_slug(slug):
         return affected_files
 
     # Look for textures folder next to the blend file
-    blend_dir = os.path.dirname(blend_filepath)
-    textures_dir = os.path.join(blend_dir, "textures")
+    blend_path = Path(blend_filepath)
+    textures_dir = blend_path.parent / "textures"
 
-    if not os.path.exists(textures_dir):
+    if not textures_dir.exists():
         print(f"DEBUG: No textures folder found at {textures_dir}")
         return affected_files
 
-    if not os.path.isdir(textures_dir):
+    if not textures_dir.is_dir():
         print(f"DEBUG: {textures_dir} exists but is not a directory")
         return affected_files
 
     print(f"DEBUG: Searching textures folder: {textures_dir}")
 
     try:
-        for filename in os.listdir(textures_dir):
-            filepath = os.path.join(textures_dir, filename)
-
+        for filepath in textures_dir.iterdir():
             # Only process files (not subdirectories)
-            if os.path.isfile(filepath) and filename.startswith(slug):
-                print(f"DEBUG: Found matching texture file: {filename}")
-                affected_files.append(filepath)
+            if filepath.is_file() and filepath.name.startswith(slug):
+                print(f"DEBUG: Found matching texture file: {filepath.name}")
+                affected_files.append(str(filepath))
 
     except Exception as e:
         print(f"DEBUG: Error reading textures directory: {e}")
@@ -172,18 +170,18 @@ def rename_datablock(datablock_info, old_slug, new_slug):
 
 def rename_image_file(filepath, old_slug, new_slug):
     """Rename an image file by replacing the old slug with new slug"""
-    directory = os.path.dirname(filepath)
-    filename = os.path.basename(filepath)
+    filepath = Path(filepath)
+    filename = filepath.name
 
     if filename.startswith(old_slug):
         if filename == old_slug:
             new_filename = new_slug
         else:
             new_filename = new_slug + filename[len(old_slug) :]
-        new_filepath = os.path.join(directory, new_filename)
-        return filepath, new_filepath
+        new_filepath = filepath.parent / new_filename
+        return str(filepath), str(new_filepath)
 
-    return filepath, filepath
+    return str(filepath), str(filepath)
 
 
 def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
@@ -202,10 +200,10 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
     for filepath in texture_files:
         old_path, new_path = rename_image_file(filepath, old_slug, new_slug)
         if old_path != new_path:
-            print(f"DEBUG: Will rename texture: {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
+            print(f"DEBUG: Will rename texture: {Path(old_path).name} -> {Path(new_path).name}")
 
             # Check if target file already exists during dry run
-            has_conflict = dry_run and os.path.exists(new_path)
+            has_conflict = dry_run and Path(new_path).exists()
             if has_conflict:
                 print(f"DEBUG: WARNING - Target file already exists: {new_path}")
 
@@ -258,24 +256,24 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
     print("DEBUG: Step 3 - Checking blend file and parent folder")
     blend_filepath = bpy.data.filepath
     if blend_filepath:
-        blend_dir = os.path.dirname(blend_filepath)
-        blend_filename = bpy.path.basename(blend_filepath)
+        blend_path = Path(blend_filepath)
+        blend_filename = blend_path.name
         print(f"DEBUG: Blend filename: {blend_filename}")
 
         if blend_filename.startswith(old_slug):
             new_filename = new_slug + blend_filename[len(old_slug) :]
-            new_blend_filepath = os.path.join(blend_dir, new_filename)
+            new_blend_filepath = blend_path.parent / new_filename
 
             # Create backup filename (same as new file but with .blend1 extension)
             backup_filename = new_slug + blend_filename[len(old_slug) :].replace(".blend", ".blend1")
-            backup_filepath = os.path.join(blend_dir, backup_filename)
+            backup_filepath = blend_path.parent / backup_filename
 
             print(f"DEBUG: Will rename blend file: {blend_filename} -> {new_filename}")
             print(f"DEBUG: Will create backup: {blend_filename} -> {backup_filename}")
 
             # Check for conflicts during dry run
-            blend_conflict = dry_run and os.path.exists(new_blend_filepath)
-            backup_conflict = dry_run and os.path.exists(backup_filepath)
+            blend_conflict = dry_run and new_blend_filepath.exists()
+            backup_conflict = dry_run and backup_filepath.exists()
 
             if blend_conflict:
                 print(f"DEBUG: WARNING - Target blend file already exists: {new_blend_filepath}")
@@ -285,33 +283,33 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
             actions.append(
                 {
                     "type": "rename_blend_file",
-                    "old_path": blend_filepath,
-                    "new_path": new_blend_filepath,
-                    "backup_path": backup_filepath,
+                    "old_path": str(blend_path),
+                    "new_path": str(new_blend_filepath),
+                    "backup_path": str(backup_filepath),
                     "has_conflict": blend_conflict or backup_conflict,
                 }
             )
 
         # Check if parent folder should be renamed
-        parent_dir = os.path.dirname(blend_dir)
-        current_folder_name = os.path.basename(blend_dir)
+        parent_dir = blend_path.parent.parent
+        current_folder_name = blend_path.parent.name
         print(f"DEBUG: Current folder name: {current_folder_name}")
 
         if current_folder_name == old_slug:
             new_folder_name = new_slug
-            new_folder_path = os.path.join(parent_dir, new_folder_name)
+            new_folder_path = parent_dir / new_folder_name
             print(f"DEBUG: Will rename parent folder: {current_folder_name} -> {new_folder_name}")
 
             # Check for conflicts during dry run
-            folder_conflict = dry_run and os.path.exists(new_folder_path)
+            folder_conflict = dry_run and new_folder_path.exists()
             if folder_conflict:
                 print(f"DEBUG: WARNING - Target folder already exists: {new_folder_path}")
 
             actions.append(
                 {
                     "type": "rename_parent_folder",
-                    "old_path": blend_dir,
-                    "new_path": new_folder_path,
+                    "old_path": str(blend_path.parent),
+                    "new_path": str(new_folder_path),
                     "has_conflict": folder_conflict,
                 }
             )
@@ -322,42 +320,46 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
             try:
                 if action["type"] == "rename_blend_file":
                     # Create backup file first
-                    os.rename(action["old_path"], action["backup_path"])
-                    print(f"DEBUG: Created backup: {os.path.basename(action['backup_path'])}")
+                    old_path = Path(action["old_path"])
+                    backup_path = Path(action["backup_path"])
+                    new_path = Path(action["new_path"])
+
+                    old_path.rename(backup_path)
+                    print(f"DEBUG: Created backup: {backup_path.name}")
                     # Save as new filename
                     if "rename_parent_folder" not in [a["type"] for a in actions]:
-                        bpy.ops.wm.save_as_mainfile(filepath=action["new_path"], relative_remap=False)
-                        print(f"DEBUG: Saved as: {os.path.basename(action['new_path'])}")
+                        bpy.ops.wm.save_as_mainfile(filepath=str(new_path), relative_remap=False)
+                        print(f"DEBUG: Saved as: {new_path.name}")
                 elif action["type"] == "rename_parent_folder":
                     try:
-                        os.rename(action["old_path"], action["new_path"])
-                        old_name = os.path.basename(action["old_path"])
-                        new_name = os.path.basename(action["new_path"])
-                        print(f"DEBUG: Renamed folder: {old_name} -> {new_name}")
+                        old_path = Path(action["old_path"])
+                        new_path = Path(action["new_path"])
+                        old_path.rename(new_path)
+                        print(f"DEBUG: Renamed folder: {old_path.name} -> {new_path.name}")
                     except Exception as e:
                         print(f"DEBUG: Error renaming folder {action['old_path']} to {action['new_path']}: {e}")
                         cls.report({"ERROR"}, f"Failed to rename folder: {e}")
                         bpy.ops.wm.save_mainfile(relative_remap=False)  # Save without changing path
                         continue
                     bpy.ops.wm.save_as_mainfile(
-                        filepath=os.path.join(action["new_path"], f"{new_slug}.blend"),
+                        filepath=str(new_path / f"{new_slug}.blend"),
                         relative_remap=False,
                     )
-                    print(f"DEBUG: Saved as: {os.path.basename(action['new_path'])}")
+                    print(f"DEBUG: Saved as: {new_path.name}")
                 elif action["type"] == "rename_image_file":
-                    os.rename(action["old_path"], action["new_path"])
-                    old_name = os.path.basename(action["old_path"])
-                    new_name = os.path.basename(action["new_path"])
-                    print(f"DEBUG: Renamed texture: {old_name} -> {new_name}")
+                    old_path = Path(action["old_path"])
+                    new_path = Path(action["new_path"])
+                    old_path.rename(new_path)
+                    print(f"DEBUG: Renamed texture: {old_path.name} -> {new_path.name}")
 
                     # Update image datablocks that reference this file
                     # Use absolute paths for comparison but keep original path format
-                    action_old_abs = os.path.abspath(action["old_path"])
+                    action_old_abs = old_path.resolve()
 
                     for img in bpy.data.images:
                         if img.filepath:
                             # Get absolute path of the image for comparison
-                            img_abs_path = os.path.abspath(bpy.path.abspath(img.filepath))
+                            img_abs_path = Path(bpy.path.abspath(img.filepath)).resolve()
 
                             if img_abs_path == action_old_abs:
                                 # Update the filepath but keep the original format (relative/absolute)
@@ -374,17 +376,17 @@ def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
                                     else:
                                         img_dir = "//"  # Just the relative prefix
                                 else:
-                                    # For absolute paths, use os.path.dirname
-                                    img_dir = os.path.dirname(original_filepath)
+                                    # For absolute paths, use Path.parent
+                                    img_dir = str(Path(original_filepath).parent)
 
-                                new_basename = os.path.basename(action["new_path"])
+                                new_basename = new_path.name
 
                                 if img_dir and img_dir != "//":
                                     # Use forward slashes for consistency with Blender paths
                                     if original_filepath.startswith("//"):
                                         img.filepath = img_dir + "/" + new_basename
                                     else:
-                                        img.filepath = os.path.join(img_dir, new_basename)
+                                        img.filepath = str(Path(img_dir) / new_basename)
                                 else:
                                     img.filepath = new_basename
 
@@ -460,9 +462,9 @@ class HAT_OT_change_slug(Operator):
                 display_limit = 30
                 for action in actions[:display_limit]:  # Limit display to avoid UI overflow
                     if action["type"] == "rename_blend_file":
-                        old_name = os.path.basename(action["old_path"])
-                        new_name = os.path.basename(action["new_path"])
-                        backup_name = os.path.basename(action["backup_path"])
+                        old_name = Path(action["old_path"]).name
+                        new_name = Path(action["new_path"]).name
+                        backup_name = Path(action["backup_path"]).name
 
                         # Show backup creation
                         row = col.row()
@@ -487,8 +489,8 @@ class HAT_OT_change_slug(Operator):
                             row.label(text=f"Rename file: {old_name} → {new_name}")
 
                     elif action["type"] == "rename_parent_folder":
-                        old_name = os.path.basename(action["old_path"])
-                        new_name = os.path.basename(action["new_path"])
+                        old_name = Path(action["old_path"]).name
+                        new_name = Path(action["new_path"]).name
                         row = col.row()
                         if action.get("has_conflict", False):
                             if "icons" in icons.preview_collections:
@@ -500,8 +502,8 @@ class HAT_OT_change_slug(Operator):
                             row.label(text=f"Rename folder: {old_name} → {new_name}")
 
                     elif action["type"] == "rename_image_file":
-                        old_name = os.path.basename(action["old_path"])
-                        new_name = os.path.basename(action["new_path"])
+                        old_name = Path(action["old_path"]).name
+                        new_name = Path(action["new_path"]).name
                         row = col.row()
                         if action.get("has_conflict", False):
                             if "icons" in icons.preview_collections:

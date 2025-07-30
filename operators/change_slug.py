@@ -4,6 +4,7 @@ import time
 from bpy.props import StringProperty
 from bpy.types import Operator
 from ..utils.filename_utils import get_slug
+from .. import icons
 
 
 def find_datablocks_with_slug(slug, max_depth=3):
@@ -202,7 +203,15 @@ def change_texture_slug(old_slug, new_slug, dry_run=False):
         old_path, new_path = rename_image_file(filepath, old_slug, new_slug)
         if old_path != new_path:
             print(f"DEBUG: Will rename texture: {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
-            actions.append({"type": "rename_image_file", "old_path": old_path, "new_path": new_path})
+
+            # Check if target file already exists during dry run
+            has_conflict = dry_run and os.path.exists(new_path)
+            if has_conflict:
+                print(f"DEBUG: WARNING - Target file already exists: {new_path}")
+
+            actions.append(
+                {"type": "rename_image_file", "old_path": old_path, "new_path": new_path, "has_conflict": has_conflict}
+            )
 
     # 2. Find datablocks to rename
     print(f"DEBUG: Step 2 - Finding datablocks with slug '{old_slug}'")
@@ -225,6 +234,15 @@ def change_texture_slug(old_slug, new_slug, dry_run=False):
                 new_name = new_slug + old_name[len(old_slug) :]
 
             if old_name != new_name:
+                # Check for naming conflicts during dry run
+                has_conflict = False
+                if dry_run:
+                    # Check if a datablock with the new name already exists in the same collection
+                    container = getattr(bpy.data, datablock_info["type"])
+                    has_conflict = new_name in container
+                    if has_conflict:
+                        print(f"DEBUG: WARNING - Datablock name conflict: {datablock_info['type']}.{new_name} exists")
+
                 actions.append(
                     {
                         "type": "rename_datablock",
@@ -232,6 +250,7 @@ def change_texture_slug(old_slug, new_slug, dry_run=False):
                         "old_name": old_name,
                         "new_name": new_name,
                         "object": datablock_info["object"],
+                        "has_conflict": has_conflict,
                     }
                 )
 
@@ -254,12 +273,22 @@ def change_texture_slug(old_slug, new_slug, dry_run=False):
             print(f"DEBUG: Will rename blend file: {blend_filename} -> {new_filename}")
             print(f"DEBUG: Will create backup: {blend_filename} -> {backup_filename}")
 
+            # Check for conflicts during dry run
+            blend_conflict = dry_run and os.path.exists(new_blend_filepath)
+            backup_conflict = dry_run and os.path.exists(backup_filepath)
+
+            if blend_conflict:
+                print(f"DEBUG: WARNING - Target blend file already exists: {new_blend_filepath}")
+            if backup_conflict:
+                print(f"DEBUG: WARNING - Backup file already exists: {backup_filepath}")
+
             actions.append(
                 {
                     "type": "rename_blend_file",
                     "old_path": blend_filepath,
                     "new_path": new_blend_filepath,
                     "backup_path": backup_filepath,
+                    "has_conflict": blend_conflict or backup_conflict,
                 }
             )
 
@@ -272,7 +301,20 @@ def change_texture_slug(old_slug, new_slug, dry_run=False):
             new_folder_name = new_slug
             new_folder_path = os.path.join(parent_dir, new_folder_name)
             print(f"DEBUG: Will rename parent folder: {current_folder_name} -> {new_folder_name}")
-            actions.append({"type": "rename_parent_folder", "old_path": blend_dir, "new_path": new_folder_path})
+
+            # Check for conflicts during dry run
+            folder_conflict = dry_run and os.path.exists(new_folder_path)
+            if folder_conflict:
+                print(f"DEBUG: WARNING - Target folder already exists: {new_folder_path}")
+
+            actions.append(
+                {
+                    "type": "rename_parent_folder",
+                    "old_path": blend_dir,
+                    "new_path": new_folder_path,
+                    "has_conflict": folder_conflict,
+                }
+            )
 
     if not dry_run:
         # Execute the actions
@@ -381,6 +423,20 @@ class HAT_OT_change_slug(Operator):
             actions = change_texture_slug(current_slug, self.new_slug, dry_run=True)
 
             if actions:
+                # Check if there are any conflicts
+                has_any_conflicts = any(action.get("has_conflict", False) for action in actions)
+
+                if has_any_conflicts:
+                    layout.separator()
+                    warning_box = layout.box()
+                    warning_row = warning_box.row()
+                    if "icons" in icons.preview_collections:
+                        icon = icons.preview_collections["icons"]["exclamation-triangle"]
+                        warning_text = "Warning: Some target files/folders already exist!"
+                        warning_row.label(text=warning_text, icon_value=icon.icon_id)
+                    else:
+                        warning_row.label(text="⚠ Warning: Some target files/folders already exist!")
+
                 layout.separator()
                 layout.label(text="Actions to be performed:")
 
@@ -394,21 +450,69 @@ class HAT_OT_change_slug(Operator):
                         old_name = os.path.basename(action["old_path"])
                         new_name = os.path.basename(action["new_path"])
                         backup_name = os.path.basename(action["backup_path"])
-                        col.label(text=f"Create backup: {backup_name}")
-                        col.label(text=f"Rename file: {old_name} → {new_name}")
+
+                        # Show backup creation
+                        row = col.row()
+                        if action.get("has_conflict", False):
+                            if "icons" in icons.preview_collections:
+                                icon = icons.preview_collections["icons"]["exclamation-triangle"]
+                                row.label(text=f"Create backup: {backup_name}", icon_value=icon.icon_id)
+                            else:
+                                row.label(text=f"⚠ Create backup: {backup_name}")
+                        else:
+                            row.label(text=f"Create backup: {backup_name}")
+
+                        # Show file rename
+                        row = col.row()
+                        if action.get("has_conflict", False):
+                            if "icons" in icons.preview_collections:
+                                icon = icons.preview_collections["icons"]["exclamation-triangle"]
+                                row.label(text=f"Rename file: {old_name} → {new_name}", icon_value=icon.icon_id)
+                            else:
+                                row.label(text=f"⚠ Rename file: {old_name} → {new_name}")
+                        else:
+                            row.label(text=f"Rename file: {old_name} → {new_name}")
+
                     elif action["type"] == "rename_parent_folder":
                         old_name = os.path.basename(action["old_path"])
                         new_name = os.path.basename(action["new_path"])
-                        col.label(text=f"Rename folder: {old_name} → {new_name}")
+                        row = col.row()
+                        if action.get("has_conflict", False):
+                            if "icons" in icons.preview_collections:
+                                icon = icons.preview_collections["icons"]["exclamation-triangle"]
+                                row.label(text=f"Rename folder: {old_name} → {new_name}", icon_value=icon.icon_id)
+                            else:
+                                row.label(text=f"⚠ Rename folder: {old_name} → {new_name}")
+                        else:
+                            row.label(text=f"Rename folder: {old_name} → {new_name}")
+
                     elif action["type"] == "rename_image_file":
                         old_name = os.path.basename(action["old_path"])
                         new_name = os.path.basename(action["new_path"])
-                        col.label(text=f"Rename texture: {old_name} → {new_name}")
+                        row = col.row()
+                        if action.get("has_conflict", False):
+                            if "icons" in icons.preview_collections:
+                                icon = icons.preview_collections["icons"]["exclamation-triangle"]
+                                row.label(text=f"Rename texture: {old_name} → {new_name}", icon_value=icon.icon_id)
+                            else:
+                                row.label(text=f"⚠ Rename texture: {old_name} → {new_name}")
+                        else:
+                            row.label(text=f"Rename texture: {old_name} → {new_name}")
+
                     elif action["type"] == "rename_datablock":
                         datablock_type = action["datablock_type"]
                         old_name = action["old_name"]
                         new_name = action["new_name"]
-                        col.label(text=f"Rename {datablock_type}: {old_name} → {new_name}")
+                        row = col.row()
+                        if action.get("has_conflict", False):
+                            if "icons" in icons.preview_collections:
+                                icon = icons.preview_collections["icons"]["exclamation-triangle"]
+                                text = f"Rename {datablock_type}: {old_name} → {new_name}"
+                                row.label(text=text, icon_value=icon.icon_id)
+                            else:
+                                row.label(text=f"⚠ Rename {datablock_type}: {old_name} → {new_name}")
+                        else:
+                            row.label(text=f"Rename {datablock_type}: {old_name} → {new_name}")
 
                 if len(actions) > display_limit:
                     col.label(text=f"... and {len(actions) - display_limit} more actions")

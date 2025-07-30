@@ -1,4 +1,4 @@
-from ...utils.fetch_textures import fetch_textures
+from ....utils.fetch_textures import fetch_textures
 
 
 def check(slug):

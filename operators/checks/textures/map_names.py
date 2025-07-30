@@ -1,7 +1,7 @@
 import bpy
-from ...utils.fetch_textures import fetch_textures
-from ...utils.filename_utils import get_map_name
-from ...utils.standard_map_names import names as standard_map_names
+from ....utils.fetch_textures import fetch_textures
+from ....utils.filename_utils import get_map_name
+from ....utils.standard_map_names import names as standard_map_names
 
 
 def check(slug):

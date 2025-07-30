@@ -6,18 +6,45 @@ from ..utils import dpi_factor
 from ..utils.filename_utils import get_slug
 from ..utils.draw_message_label import draw_message_label
 
-check_list = (
-    os.path.splitext(f)[0] for f in os.listdir(os.path.join(os.path.dirname(__file__), "checks")) if f.endswith(".py")
-)
 
-checks = {}
-for c in check_list:
-    if "bpy" not in locals():
-        m = importlib.import_module(".checks." + c, __package__)
-    else:
-        m = sys.modules["bl_ext.user_default.polyhaven_hat.operators.checks." + c]
-        importlib.reload(m)
-    checks[c] = m
+def discover_checks():
+    """Discover all check modules in the checks directory and its subfolders"""
+    checks_dir = os.path.join(os.path.dirname(__file__), "checks")
+    check_modules = {}
+
+    # Walk through all subdirectories in checks
+    for root, dirs, files in os.walk(checks_dir):
+        # Skip __pycache__ directories
+        dirs[:] = [d for d in dirs if d != "__pycache__"]
+
+        for file in files:
+            if file.endswith(".py") and file != "__init__.py":
+                # Get relative path from checks directory
+                rel_path = os.path.relpath(root, checks_dir)
+                if rel_path == ".":
+                    # File is in the root checks directory
+                    module_path = file[:-3]  # Remove .py extension
+                else:
+                    # File is in a subdirectory
+                    module_path = rel_path.replace(os.sep, ".") + "." + file[:-3]
+
+                check_name = file[:-3]  # Use just the filename as the check name
+
+                try:
+                    if "bpy" not in locals():
+                        m = importlib.import_module(".checks." + module_path, __package__)
+                    else:
+                        full_module_name = "bl_ext.user_default.polyhaven_hat.operators.checks." + module_path
+                        m = sys.modules[full_module_name]
+                        importlib.reload(m)
+                    check_modules[check_name] = m
+                except (ImportError, KeyError) as e:
+                    print(f"Failed to load check module {module_path}: {e}")
+
+    return check_modules
+
+
+checks = discover_checks()
 
 import bpy
 

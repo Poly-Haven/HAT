@@ -1,0 +1,1 @@
+# Asset structure related checks

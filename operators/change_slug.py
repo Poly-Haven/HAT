@@ -58,14 +58,12 @@ def find_datablocks_with_slug(slug, max_depth=3):
 
             # Additional safety check - make sure container is actually iterable and has items
             if not hasattr(container, "__iter__"):
-                print(f"DEBUG: {data_type} is not iterable, skipping")
                 continue
 
             # Check if container has length - if it's empty, skip it
             try:
                 container_len = len(container)
                 if container_len == 0:
-                    print(f"DEBUG: {data_type} is empty, skipping")
                     continue
                 print(f"DEBUG: {data_type} has {container_len} items")
             except (TypeError, AttributeError):
@@ -197,8 +195,48 @@ def change_texture_slug(old_slug, new_slug, dry_run=False):
 
     actions = []
 
-    # 1. Find blend file and parent folder rename actions
-    print("DEBUG: Step 1 - Checking blend file and parent folder")
+    # 1. Find texture files to rename
+    print("DEBUG: Step 1 - Finding texture files")
+    texture_files = find_texture_files_with_slug(old_slug)
+    for filepath in texture_files:
+        old_path, new_path = rename_image_file(filepath, old_slug, new_slug)
+        if old_path != new_path:
+            print(f"DEBUG: Will rename texture: {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
+            actions.append({"type": "rename_image_file", "old_path": old_path, "new_path": new_path})
+
+    # 2. Find datablocks to rename
+    print(f"DEBUG: Step 2 - Finding datablocks with slug '{old_slug}'")
+
+    # TEMPORARY: Disable datablock search to test if this is causing the freeze
+    # Uncomment the line below to re-enable datablock search
+    datablocks = find_datablocks_with_slug(old_slug)
+    # datablocks = []  # Disable datablock search temporarily
+
+    print(f"DEBUG: Found {len(datablocks)} datablocks")
+
+    for datablock_info in datablocks:
+        old_name = datablock_info["name"]
+
+        # Calculate what the new name would be WITHOUT actually renaming during dry run
+        if old_name.startswith(old_slug):
+            if old_name == old_slug:
+                new_name = new_slug
+            else:
+                new_name = new_slug + old_name[len(old_slug) :]
+
+            if old_name != new_name:
+                actions.append(
+                    {
+                        "type": "rename_datablock",
+                        "datablock_type": datablock_info["type"],
+                        "old_name": old_name,
+                        "new_name": new_name,
+                        "object": datablock_info["object"],
+                    }
+                )
+
+    # 3. Find blend file and parent folder rename actions (done last)
+    print("DEBUG: Step 3 - Checking blend file and parent folder")
     blend_filepath = bpy.data.filepath
     if blend_filepath:
         blend_dir = os.path.dirname(blend_filepath)
@@ -236,46 +274,6 @@ def change_texture_slug(old_slug, new_slug, dry_run=False):
             print(f"DEBUG: Will rename parent folder: {current_folder_name} -> {new_folder_name}")
             actions.append({"type": "rename_parent_folder", "old_path": blend_dir, "new_path": new_folder_path})
 
-    # 2. Find texture files to rename
-    print("DEBUG: Step 2 - Finding texture files")
-    texture_files = find_texture_files_with_slug(old_slug)
-    for filepath in texture_files:
-        old_path, new_path = rename_image_file(filepath, old_slug, new_slug)
-        if old_path != new_path:
-            print(f"DEBUG: Will rename texture: {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
-            actions.append({"type": "rename_image_file", "old_path": old_path, "new_path": new_path})
-
-    # 3. Find datablocks to rename
-    print(f"DEBUG: Step 3 - Finding datablocks with slug '{old_slug}'")
-
-    # TEMPORARY: Disable datablock search to test if this is causing the freeze
-    # Uncomment the line below to re-enable datablock search
-    datablocks = find_datablocks_with_slug(old_slug)
-    # datablocks = []  # Disable datablock search temporarily
-
-    print(f"DEBUG: Found {len(datablocks)} datablocks")
-
-    for datablock_info in datablocks:
-        old_name = datablock_info["name"]
-
-        # Calculate what the new name would be WITHOUT actually renaming during dry run
-        if old_name.startswith(old_slug):
-            if old_name == old_slug:
-                new_name = new_slug
-            else:
-                new_name = new_slug + old_name[len(old_slug) :]
-
-            if old_name != new_name:
-                actions.append(
-                    {
-                        "type": "rename_datablock",
-                        "datablock_type": datablock_info["type"],
-                        "old_name": old_name,
-                        "new_name": new_name,
-                        "object": datablock_info["object"],
-                    }
-                )
-
     if not dry_run:
         # Execute the actions
         for action in actions:
@@ -297,10 +295,46 @@ def change_texture_slug(old_slug, new_slug, dry_run=False):
                     old_name = os.path.basename(action["old_path"])
                     new_name = os.path.basename(action["new_path"])
                     print(f"DEBUG: Renamed texture: {old_name} -> {new_name}")
-                    # Update image datablocks that reference this file (keep relative paths)
+
+                    # Update image datablocks that reference this file
+                    # Use absolute paths for comparison but keep original path format
+                    action_old_abs = os.path.abspath(action["old_path"])
+
                     for img in bpy.data.images:
-                        if img.filepath and img.filepath == action["old_path"]:
-                            img.filepath = action["new_path"]
+                        if img.filepath:
+                            # Get absolute path of the image for comparison
+                            img_abs_path = os.path.abspath(bpy.path.abspath(img.filepath))
+
+                            if img_abs_path == action_old_abs:
+                                # Update the filepath but keep the original format (relative/absolute)
+                                # Get the directory part of the original filepath correctly
+                                original_filepath = img.filepath
+
+                                # Handle Blender's relative paths (starting with //)
+                                if original_filepath.startswith("//"):
+                                    # For relative paths, split on the last path separator
+                                    if "\\" in original_filepath:
+                                        img_dir = original_filepath.rsplit("\\", 1)[0]
+                                    elif "/" in original_filepath:
+                                        img_dir = original_filepath.rsplit("/", 1)[0]
+                                    else:
+                                        img_dir = "//"  # Just the relative prefix
+                                else:
+                                    # For absolute paths, use os.path.dirname
+                                    img_dir = os.path.dirname(original_filepath)
+
+                                new_basename = os.path.basename(action["new_path"])
+
+                                if img_dir and img_dir != "//":
+                                    # Use forward slashes for consistency with Blender paths
+                                    if original_filepath.startswith("//"):
+                                        img.filepath = img_dir + "/" + new_basename
+                                    else:
+                                        img.filepath = os.path.join(img_dir, new_basename)
+                                else:
+                                    img.filepath = new_basename
+
+                                print(f"DEBUG: Updated image datablock filepath: {img.name} -> {img.filepath}")
                 elif action["type"] == "rename_datablock":
                     # Actually rename the datablock during execution
                     datablock = action["object"]

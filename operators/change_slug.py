@@ -186,7 +186,7 @@ def rename_image_file(filepath, old_slug, new_slug):
     return filepath, filepath
 
 
-def change_texture_slug(old_slug, new_slug, dry_run=False):
+def change_texture_slug(cls, old_slug, new_slug, dry_run=False):
     """Change the asset slug, in all locations where it is necessary"""
     print(f"DEBUG: change_texture_slug called with old_slug='{old_slug}', new_slug='{new_slug}', dry_run={dry_run}")
 
@@ -325,13 +325,25 @@ def change_texture_slug(old_slug, new_slug, dry_run=False):
                     os.rename(action["old_path"], action["backup_path"])
                     print(f"DEBUG: Created backup: {os.path.basename(action['backup_path'])}")
                     # Save as new filename
-                    bpy.ops.wm.save_as_mainfile(filepath=action["new_path"])
-                    print(f"DEBUG: Saved as: {os.path.basename(action['new_path'])}")
+                    if "rename_parent_folder" not in [a["type"] for a in actions]:
+                        bpy.ops.wm.save_as_mainfile(filepath=action["new_path"], relative_remap=False)
+                        print(f"DEBUG: Saved as: {os.path.basename(action['new_path'])}")
                 elif action["type"] == "rename_parent_folder":
-                    os.rename(action["old_path"], action["new_path"])
-                    old_name = os.path.basename(action["old_path"])
-                    new_name = os.path.basename(action["new_path"])
-                    print(f"DEBUG: Renamed folder: {old_name} -> {new_name}")
+                    try:
+                        os.rename(action["old_path"], action["new_path"])
+                        old_name = os.path.basename(action["old_path"])
+                        new_name = os.path.basename(action["new_path"])
+                        print(f"DEBUG: Renamed folder: {old_name} -> {new_name}")
+                    except Exception as e:
+                        print(f"DEBUG: Error renaming folder {action['old_path']} to {action['new_path']}: {e}")
+                        cls.report({"ERROR"}, f"Failed to rename folder: {e}")
+                        bpy.ops.wm.save_mainfile(relative_remap=False)  # Save without changing path
+                        continue
+                    bpy.ops.wm.save_as_mainfile(
+                        filepath=os.path.join(action["new_path"], f"{new_slug}.blend"),
+                        relative_remap=False,
+                    )
+                    print(f"DEBUG: Saved as: {os.path.basename(action['new_path'])}")
                 elif action["type"] == "rename_image_file":
                     os.rename(action["old_path"], action["new_path"])
                     old_name = os.path.basename(action["old_path"])
@@ -384,6 +396,7 @@ def change_texture_slug(old_slug, new_slug, dry_run=False):
                     print(f"DEBUG: Renamed datablock {action['old_name']} -> {action['new_name']}")
             except Exception as e:
                 print(f"DEBUG: Error executing action {action}: {e}")
+                cls.report({"ERROR"}, f"Failed to execute action: {e}")
 
     print(f"DEBUG: change_texture_slug completed. Total actions: {len(actions)}")
     return actions
@@ -420,7 +433,7 @@ class HAT_OT_change_slug(Operator):
         # Show preview of actions
         current_slug = get_slug()
         if current_slug and self.new_slug and current_slug != self.new_slug:
-            actions = change_texture_slug(current_slug, self.new_slug, dry_run=True)
+            actions = change_texture_slug(self, current_slug, self.new_slug, dry_run=True)
 
             if actions:
                 # Check if there are any conflicts
@@ -533,7 +546,7 @@ class HAT_OT_change_slug(Operator):
             return {"FINISHED"}
 
         # Perform the slug change
-        actions = change_texture_slug(current_slug, self.new_slug, dry_run=False)
+        actions = change_texture_slug(self, current_slug, self.new_slug, dry_run=False)
 
         if actions:
             message = (

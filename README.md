@@ -48,6 +48,7 @@ Checks:
 * [x] Materials should not contain math nodes, which mess with exporters
 * [x] Materials should not contain mix nodes
 * [x] No unused nodes in materials
+* [x] Image node labels (if set) should match map names
 * [x] Materials should have exactly one output node
 * [x] Only Principled BSDF shaders should be used
 * [x] SSS may have been accidentally enabled

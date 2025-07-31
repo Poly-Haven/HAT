@@ -67,15 +67,37 @@ def generate_checklist():
     # Sort files alphabetically by their relative path
     check_files.sort(key=lambda x: x[0])
 
-    checklist_lines = ["Checks:", ""]
-
+    # Group checks by subfolder
+    grouped_checks = {}
     for rel_path, file_path in check_files:
-        docstring = get_check_function_docstring(file_path)
+        # Get the subfolder name (first part of the path)
+        if os.path.sep in rel_path:
+            subfolder = rel_path.split(os.path.sep)[0]
+        else:
+            subfolder = "General"  # For files directly in the checks directory
 
+        if subfolder not in grouped_checks:
+            grouped_checks[subfolder] = []
+
+        docstring = get_check_function_docstring(file_path)
         if docstring:
             # Clean up the docstring - take first line and remove extra whitespace
             description = docstring.strip().split("\n")[0].strip()
+            grouped_checks[subfolder].append(description)
+
+    checklist_lines = ["Checks:", ""]
+
+    # Generate checklist with subheadings
+    for subfolder in sorted(grouped_checks.keys()):
+        # Convert subfolder name to title case and replace underscores with spaces
+        section_title = subfolder.replace("_", " ").title()
+        checklist_lines.append(f"### {section_title}")
+        checklist_lines.append("")
+
+        for description in grouped_checks[subfolder]:
             checklist_lines.append(f"* [x] {description}")
+
+        checklist_lines.append("")  # Add blank line after each section
 
     return "\n".join(checklist_lines)
 
@@ -114,8 +136,8 @@ def update_readme():
     def replacement(match):
         prefix = match.group(1)
         suffix = match.group(3)
-        # Add a blank line after the comment/header and before the checks
-        return prefix + new_checklist[8:] + suffix  # Skip "Checks:\n\n" from new_checklist
+        # Add the new checklist content (skip "Checks:\n\n" from new_checklist)
+        return prefix + new_checklist[8:] + suffix
 
     updated_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
 
@@ -126,8 +148,10 @@ def update_readme():
     with open(readme_path, "w", encoding="utf-8") as f:
         f.write(updated_content)
 
+    # Count total checklist items across all sections
     checklist_items = [l for l in new_checklist.split("\n") if l.startswith("* [x]")]
-    print(f"README.md updated with {len(checklist_items)} checks")
+    sections = [l for l in new_checklist.split("\n") if l.startswith("### ")]
+    print(f"README.md updated with {len(checklist_items)} checks across {len(sections)} sections")
 
 
 if __name__ == "__main__":

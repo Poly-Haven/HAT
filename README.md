@@ -50,6 +50,7 @@ Checks:
 * [x] No unused nodes in materials
 * [x] Materials should have exactly one output node
 * [x] Only Principled BSDF shaders should be used
+* [x] SSS may have been accidentally enabled
 * [x] All textures should use UVs for mapping
 
 ### Naming

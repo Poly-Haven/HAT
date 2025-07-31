@@ -43,7 +43,7 @@ Checks:
 
 ### Materials
 
-* [x] Material IOR (Index of Refraction) values are not set to 0
+* [x] Material IOR (Index of Refraction) values are within expected range
 * [x] Material names should match the asset slug
 
 ### Naming

@@ -9,7 +9,7 @@ def check(slug):
     result = "SUCCESS"
     messages = []
 
-    strict = bpy.context.scene.hat_props.asset_type == "texture"
+    strict = bpy.context.window_manager.hat_props.asset_type == "texture"
 
     textures = fetch_textures()
     for image in textures:

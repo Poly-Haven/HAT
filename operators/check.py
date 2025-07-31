@@ -76,15 +76,15 @@ class HAT_OT_check(bpy.types.Operator):
             row = col.row()
             row.alignment = "RIGHT"
             row.prop(
-                context.scene.hat_props,
+                context.window_manager.hat_props,
                 "test_on_save",
-                icon="CHECKBOX_HLT" if context.scene.hat_props.test_on_save else "CHECKBOX_DEHLT",
+                icon="CHECKBOX_HLT" if context.window_manager.hat_props.test_on_save else "CHECKBOX_DEHLT",
                 toggle=True,
             )
 
     def invoke(self, context, event):
         self.tests = []  # Reset after rerun
-        context.scene.hat_props.test_on_save = True
+        context.window_manager.hat_props.test_on_save = True
 
         slug = get_slug()
 
@@ -105,7 +105,7 @@ class HAT_OT_check(bpy.types.Operator):
             self.tests.append(["SUCCESS", ["All checks passed!"]])
 
         # Store tests in scene prop
-        context.scene.hat_props.latest_tests = json.dumps(self.tests)
+        context.window_manager.hat_props.latest_tests = json.dumps(self.tests)
 
         if self.on_save:
             failed_tests = list((t for t in self.tests if t[0] != "SUCCESS"))

@@ -47,7 +47,7 @@ def export_model(cls, context, slug, gltf_file):
 
     select_objects_in_collection(collection)
 
-    if context.scene.hat_props.asset_type == "model":
+    if context.window_manager.hat_props.asset_type == "model":
         bpy.ops.export_scene.gltf(
             export_format="GLTF_SEPARATE",
             export_texture_dir="textures_TEMP",
@@ -223,7 +223,7 @@ class HAT_OT_export_gltf(bpy.types.Operator):
 
         gltf_file = os.path.join(os.path.dirname(bpy.data.filepath), slug + ".gltf")
 
-        if context.scene.hat_props.asset_type == "model":
+        if context.window_manager.hat_props.asset_type == "model":
             export_model(cls, context, slug, gltf_file)
         else:
             export_texture(cls, context, slug, gltf_file)

@@ -62,7 +62,7 @@ def pre_save_handler(dummy):
 @persistent
 def post_save_handler(dummy):
     """Run tests"""
-    if bpy.context.scene.hat_props.test_on_save:
+    if bpy.context.window_manager.hat_props.test_on_save:
         bpy.ops.hat.check("INVOKE_DEFAULT", on_save=True)
 
     for t, spaces in space_shading_types.items():
@@ -88,7 +88,7 @@ def register():
     for cls in classes:
         register_class(cls)
 
-    bpy.types.Scene.hat_props = bpy.props.PointerProperty(type=HATProperties)
+    bpy.types.WindowManager.hat_props = bpy.props.PointerProperty(type=HATProperties)
     bpy.app.handlers.save_pre.append(pre_save_handler)
     bpy.app.handlers.save_post.append(post_save_handler)
 
@@ -99,7 +99,7 @@ def unregister():
 
     icons.previews_unregister()
 
-    del bpy.types.Scene.hat_props
+    del bpy.types.WindowManager.hat_props
 
     from bpy.utils import unregister_class
 

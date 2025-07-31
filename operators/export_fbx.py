@@ -10,7 +10,7 @@ class HAT_OT_export_fbx(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.data.is_saved and context.scene.hat_props.asset_type == "model"
+        return bpy.data.is_saved and context.window_manager.hat_props.asset_type == "model"
 
     def execute(cls, context):
         slug = get_slug()

@@ -13,7 +13,7 @@ def check(slug):
         "LIGHT",
     ]
 
-    severity = "ERROR" if bpy.context.scene.hat_props.asset_type == "texture" else "WARNING"
+    severity = "ERROR" if bpy.context.window_manager.hat_props.asset_type == "texture" else "WARNING"
 
     for obj in bpy.data.objects:
         if obj.scale != one and obj.type not in ignored_types:

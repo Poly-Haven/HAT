@@ -8,7 +8,7 @@ def check(slug):
 
     materials = list((m for m in bpy.data.materials if m.users > 0 and not m.is_grease_pencil))
 
-    if bpy.context.scene.hat_props.asset_type == "model":
+    if bpy.context.window_manager.hat_props.asset_type == "model":
         for mat in materials:
             if not mat.name.startswith(slug):
                 result = "WARNING"

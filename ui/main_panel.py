@@ -20,7 +20,7 @@ class HAT_PT_main(bpy.types.Panel):
 
     def draw_header(self, context):
         i = icons.get_icons()
-        props = context.scene.hat_props
+        props = context.window_manager.hat_props
 
         layout = self.layout
         row = layout.row()
@@ -32,7 +32,7 @@ class HAT_PT_main(bpy.types.Panel):
         row.separator()
 
     def draw(self, context):
-        props = context.scene.hat_props
+        props = context.window_manager.hat_props
 
         col = self.layout.column(align=True)
         row = col.row()
@@ -51,10 +51,10 @@ class HAT_PT_results(bpy.types.Panel):
 
     @classmethod
     def poll(self, context):
-        return context.scene.hat_props.latest_tests != ""
+        return context.window_manager.hat_props.latest_tests != ""
 
     def draw(self, context):
-        props = context.scene.hat_props
+        props = context.window_manager.hat_props
         col = self.layout.column()
         if props.latest_tests:
             try:
@@ -76,7 +76,7 @@ class HAT_PT_info(bpy.types.Panel):
 
     def draw(self, context):
         i = icons.get_icons()
-        props = context.scene.hat_props
+        props = context.window_manager.hat_props
         slug = get_slug()
         col = self.layout.column(align=True)
 
@@ -125,7 +125,7 @@ class HAT_PT_tools(bpy.types.Panel):
     bl_parent_id = "HAT_PT_main"
 
     def draw(self, context):
-        props = context.scene.hat_props
+        props = context.window_manager.hat_props
         col = self.layout.column()
         col.operator(change_slug.HAT_OT_change_slug.bl_idname, icon="OUTLINER_OB_FONT")
         col.separator()

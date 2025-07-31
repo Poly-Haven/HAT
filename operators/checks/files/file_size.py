@@ -10,7 +10,7 @@ def check(slug):
     if bpy.data.filepath:
         file_size = os.path.getsize(bpy.data.filepath)
 
-        if bpy.context.scene.hat_props.asset_type == "texture":
+        if bpy.context.window_manager.hat_props.asset_type == "texture":
             warn_file_size = 300  # kB
             max_file_size = 500
         else:

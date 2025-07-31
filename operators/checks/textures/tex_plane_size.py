@@ -7,7 +7,7 @@ def check(slug):
     result = "SUCCESS"
     messages = []
 
-    if bpy.context.scene.hat_props.asset_type == "texture":
+    if bpy.context.window_manager.hat_props.asset_type == "texture":
         expected_objects = ["Sphere", "Plane"]
         for obj_name in expected_objects:
             try:

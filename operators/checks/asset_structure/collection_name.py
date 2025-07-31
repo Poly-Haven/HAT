@@ -6,7 +6,7 @@ def check(slug):
     result = "SUCCESS"
     messages = []
 
-    if bpy.context.scene.hat_props.asset_type == "model":
+    if bpy.context.window_manager.hat_props.asset_type == "model":
         try:
             _ = bpy.data.collections[slug]
         except KeyError:

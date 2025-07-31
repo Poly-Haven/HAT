@@ -16,31 +16,32 @@ Checks:
 <!-- This list is auto-generated from docstrings in operators/checks/*.py files.
      Run 'python build_readme_checklist.py' to update. -->
 
-* [x] All objects have applied scale (1.0) to ensure no unexpected behaviour
-* [x] Blender version is the latest official release
 * [x] Model collection name should match the asset slug
 * [x] Texture datablock names should match their file names
-* [x] File size is within acceptable limits for the asset type
-* [x] All referenced texture files exist on disk
 * [x] Geometry nodes collections are properly structured with LOD0 or static collections
 * [x] LOD (Level of Detail) collections and objects are properly structured
-* [x] Texture map names follow standardized naming conventions
-* [x] Material IOR (Index of Refraction) values are not set to 0
-* [x] Material names should match the asset slug
 * [x] No world or HDRI data blocks should be present in the asset
-* [x] Texture maps use appropriate color space settings (Non-Color Data when required)
-* [x] Objects should be at the origin
 * [x] File should contain only one scene and one view layer
+* [x] Texture assets should only have "Plane" and "Sphere" objects
 * [x] No orphaned data blocks (unused data) should be present
-* [x] No texture files should be packed into the blend file
+* [x] File size is within acceptable limits for the asset type
+* [x] All referenced texture files exist on disk
 * [x] All texture paths should be relative and point to the textures folder
-* [x] All texture resolutions should match within the asset
+* [x] All objects have applied scale (1.0) to ensure no unexpected behaviour
+* [x] Objects should be at the origin
 * [x] Objects should not have shape keys which may cause issues for GLTF export
-* [x] Asset slug follows proper naming conventions (lowercase, allowed characters only)
-* [x] Texture preview plane has non-default dimensions
-* [x] Texture file names should start with the asset slug and follow naming conventions
 * [x] Scene unit scale is set to 1.0 meters
 * [x] Objects should not have vertex colors which may break GLTF export
+* [x] Material IOR (Index of Refraction) values are not set to 0
+* [x] Material names should match the asset slug
+* [x] Asset slug follows proper naming conventions (lowercase, allowed characters only)
+* [x] Blender version is the latest official release
+* [x] Texture map names follow standardized naming conventions
+* [x] Texture maps use appropriate color space settings (Non-Color Data when required)
+* [x] No texture files should be packed into the blend file
+* [x] All texture resolutions should match within the asset
+* [x] Texture preview plane has non-default dimensions
+* [x] Texture file names should start with the asset slug and follow naming conventions
 
 To do:
 

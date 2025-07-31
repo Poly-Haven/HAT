@@ -55,19 +55,21 @@ def generate_checklist():
     checks_dir = os.path.join(os.path.dirname(__file__), "operators", "checks")
     check_files = []
 
-    # Get all Python files in the checks directory
-    for filename in os.listdir(checks_dir):
-        if filename.endswith(".py") and filename != "__init__.py":
-            file_path = os.path.join(checks_dir, filename)
-            if os.path.isfile(file_path):
-                check_files.append((filename, file_path))
+    # Get all Python files in the checks directory and subdirectories
+    for root, dirs, files in os.walk(checks_dir):
+        for filename in files:
+            if filename.endswith(".py") and filename != "__init__.py":
+                file_path = os.path.join(root, filename)
+                # Get relative path from checks directory for better organization
+                rel_path = os.path.relpath(file_path, checks_dir)
+                check_files.append((rel_path, file_path))
 
-    # Sort files alphabetically
+    # Sort files alphabetically by their relative path
     check_files.sort(key=lambda x: x[0])
 
     checklist_lines = ["Checks:", ""]
 
-    for filename, file_path in check_files:
+    for rel_path, file_path in check_files:
         docstring = get_check_function_docstring(file_path)
 
         if docstring:
@@ -106,7 +108,7 @@ def update_readme():
     new_checklist = generate_checklist()
 
     # Find the existing checklist section and replace it
-    # Look for "Checks:" followed by bullet points until we hit "To do:" or another section
+    # Look for "Checks:" followed by any content until we hit "To do:" or another section
     pattern = r"(Checks:\s*\n(?:<!--.*?-->\s*\n)?)(.*?)(\n\nTo do:)"
 
     def replacement(match):

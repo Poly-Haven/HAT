@@ -48,6 +48,7 @@ Checks:
 * [x] Materials should not contain math nodes, which mess with exporters
 * [x] No unused nodes in materials
 * [x] Materials should have exactly one output node
+* [x] Only Principled BSDF shaders should be used
 * [x] All textures should use UVs for mapping
 
 ### Naming

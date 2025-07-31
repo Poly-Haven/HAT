@@ -1,5 +1,5 @@
 import bpy
-from ...utils import filename_utils
+from ....utils import filename_utils
 
 
 def check(slug):

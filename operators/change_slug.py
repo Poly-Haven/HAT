@@ -10,7 +10,7 @@ from .. import icons
 log = logging.getLogger(__name__)
 
 
-def find_datablocks_with_slug(slug, max_depth=3):
+def find_datablocks_with_slug(slug):
     """Find all datablocks that start with the slug - generic future-proof version"""
     log.debug(f"Starting search for datablocks with slug: '{slug}'")
     start_time = time.time()

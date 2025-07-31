@@ -46,6 +46,7 @@ Checks:
 * [x] Material IOR (Index of Refraction) values are within expected range
 * [x] Material names should match the asset slug
 * [x] No unused nodes in materials
+* [x] Materials should have exactly one output node
 
 ### Naming
 

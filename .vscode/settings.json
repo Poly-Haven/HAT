@@ -24,5 +24,7 @@
       ".idea": true,
       "hat_updater": true,
   },
-  "editor.tabSize": 4,
+"editor.tabSize": 4,
+"python-envs.defaultEnvManager": "ms-python.python:system",
+"python-envs.pythonProjects": [],
 }

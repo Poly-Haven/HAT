@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "polyhaven_hat"
-version = "1.0.25"
+version = "1.1.0"
 name = "HAT"
 tagline = "Internal quality control tool for polyhaven.com"
 maintainer = "Greg Zaal <greg@polyhaven.com>"
@@ -9,7 +9,7 @@ type = "add-on"
 website = "https://github.com/Poly-Haven/HAT"
 tags = ["Scene", "Import-Export"]
 
-blender_version_min = "4.2.0"
+blender_version_min = "4.5.0"
 # blender_version_max = "5.1.0"
 
 license = ["SPDX:GPL-2.0-or-later"]

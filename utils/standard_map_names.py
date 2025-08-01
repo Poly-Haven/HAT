@@ -10,6 +10,7 @@ names = {
     "alpha": "Alpha",
     "emission": "Emission",
     "mask": "Mask",
+    "arm": "AO_Rough_Metal",
 }
 
 aliases = {

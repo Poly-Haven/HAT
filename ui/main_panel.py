@@ -9,7 +9,8 @@ from ..operators import export_gltf
 from ..operators import fix_img_db_name
 from ..operators import open_folder
 from ..operators import scrub_datablocks
-from ..utils.filename_utils import get_slug
+from ..utils.filename_utils import get_slug, remove_num, get_map_name
+from ..utils.standard_map_names import names as standard_map_names
 from ..utils.draw_message_label import draw_message_label
 from .. import icons
 
@@ -213,6 +214,8 @@ class HAT_PT_folder_structure(bpy.types.Panel):
                     row.label(text="", icon="CHECKMARK")
                 elif status == "invalid":
                     row.label(text="", icon_value=i["exclamation-triangle"].icon_id)
+                elif status == "unknown":
+                    row.label(text="", icon_value=i["question"].icon_id)
 
         # Check for missing required items (files)
         if current_folder in required:
@@ -225,7 +228,11 @@ class HAT_PT_folder_structure(bpy.types.Panel):
                 pattern_found = False
                 for item in all_items:
                     if not self._should_ignore(item.name, ignored):
-                        if fnmatch.fnmatch(item.name.lower(), actual_pattern.lower()):
+                        item_name = item.name
+                        if current_folder == "textures":
+                            basename, ext = Path(item_name).stem, Path(item_name).suffix
+                            item_name = remove_num(basename) + ext
+                        if fnmatch.fnmatch(item_name.lower(), actual_pattern.lower()):
                             pattern_found = True
                             break
 
@@ -292,8 +299,19 @@ class HAT_PT_folder_structure(bpy.types.Panel):
         if current_folder in required:
             for pattern in required[current_folder]:
                 actual_pattern = pattern.replace("slug", slug)
+                if current_folder == "textures":
+                    basename, ext = Path(item_name).stem, Path(item_name).suffix
+                    item_name = remove_num(basename) + ext
                 if fnmatch.fnmatch(item_name.lower(), actual_pattern.lower()):
                     return "required"
+
+        # Flag unknown map types
+        if current_folder == "textures":
+            map_name = get_map_name(
+                item_name, slug, strict=bpy.context.window_manager.hat_props.asset_type == "texture"
+            )
+            if map_name not in standard_map_names:
+                return "unknown"
 
         # Check valid patterns for current folder
         if current_folder in valid:
@@ -311,6 +329,18 @@ class HAT_PT_folder_structure(bpy.types.Panel):
     def draw(self, context):
         props = context.window_manager.hat_props
         slug = get_slug()
+
+        valid_root_common = [
+            "*.blend",
+            "*.gltf",
+            "*.bin",
+            "*.txt",
+            "*.files.json",
+            "*.obj",
+            "*.mtl",
+            "*.fbx",
+            "*.ply",
+        ]
 
         required = {  # These *must* be present
             "texture": {
@@ -354,12 +384,7 @@ class HAT_PT_folder_structure(bpy.types.Panel):
         }
         valid = {  # These can be present, but are not required
             "texture": {
-                "/": [
-                    "slug.gltf",
-                    "slug.bin",
-                    "*.txt",
-                    "*.files.json",
-                ],
+                "/": valid_root_common,
                 "textures": [
                     "slug_*.png",
                 ],
@@ -371,12 +396,7 @@ class HAT_PT_folder_structure(bpy.types.Panel):
                 ],
             },
             "model": {
-                "/": [
-                    "slug.gltf",
-                    "slug.bin",
-                    "*.txt",
-                    "*.files.json",
-                ],
+                "/": valid_root_common,
                 "renders": [
                     "*.png",
                 ],

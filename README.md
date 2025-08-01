@@ -81,6 +81,7 @@ Tools:
 * [x] Export GLTF
 * [x] Clean file of unused datablocks, including fake-user ones
 * [x] Make image datablock names match their file names
+* [x] Open folder containing Blend file
 * [ ] Make mesh datablock name match object name
 
 Misc:

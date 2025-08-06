@@ -30,8 +30,8 @@ def check(slug):
         return result, messages
 
     current_version = bpy.app.version_string
-    major, minor, patch = map(int, current_version.split("."))
-    server_major, server_minor, server_patch = map(int, server_version.split("."))
+    major, minor, patch = map(int, current_version.split(" ")[0].split("."))
+    server_major, server_minor, server_patch = map(int, server_version.split(" ")[0].split("."))
 
     if (major, minor) < (server_major, server_minor):
         result = "ERROR"

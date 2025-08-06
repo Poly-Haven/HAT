@@ -1,6 +1,9 @@
 import bpy
+import logging
 from ....utils.filename_utils import get_map_name
 from ....utils import standard_map_names
+
+log = logging.getLogger(__name__)
 
 
 def check(slug):
@@ -24,7 +27,7 @@ def check(slug):
                             label_map_name = standard_map_names.aliases[node.label.lower()]
                         else:
                             label_map_name = node.label.lower()
-                        print(f"{node.label}\n\tmap_name: {map_name}\n\tlabel_map_name: {label_map_name}")
+                        log.debug(f"{node.label}\n\tmap_name: {map_name}\n\tlabel_map_name: {label_map_name}")
                         if map_name != label_map_name:
                             result = (
                                 "ERROR" if bpy.context.window_manager.hat_props.asset_type == "texture" else "WARNING"

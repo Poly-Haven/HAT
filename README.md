@@ -67,7 +67,6 @@ Checks:
 * [x] Texture map names follow standardized naming conventions
 * [x] Texture maps use appropriate color space settings (Non-Color Data when required)
 * [x] No texture files should be packed into the blend file
-* [x] All texture resolutions should match within the asset
 * [x] Texture preview plane has non-default dimensions
 * [x] Texture file names should start with the asset slug and follow naming conventions
 

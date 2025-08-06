@@ -7,7 +7,7 @@
       "id": "polyhaven_hat",
       "name": "HAT",
       "tagline": "Internal quality control tool for polyhaven.com",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "type": "add-on",
       "maintainer": "Greg Zaal <greg@polyhaven.com>",
       "license": [
@@ -22,9 +22,9 @@
         "Scene",
         "Import-Export"
       ],
-      "archive_url": "https://github.com/Poly-Haven/HAT/releases/download/v1.1.1/polyhaven_hat-1.1.1.zip",
-      "archive_size": 61413,
-      "archive_hash": "sha256:007169822fc71a818bf8b9b43ea054cc1f888ca78ce45c7d3b089271087f8bc6"
+      "archive_url": "https://github.com/Poly-Haven/HAT/releases/download/v1.1.2/polyhaven_hat-1.1.2.zip",
+      "archive_size": 60933,
+      "archive_hash": "sha256:a3c54b6700750e7de5338bfce51aa439df60d7a2aedabf9093cec522194868b4"
     }
   ]
 }

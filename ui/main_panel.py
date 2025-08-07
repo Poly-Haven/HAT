@@ -123,6 +123,16 @@ class HAT_PT_info(bpy.types.Panel):
             else:
                 col.label(text=f'No material named "{slug}" found.', icon="ERROR")
 
+        # Model info
+        if props.asset_type == "model":
+            geo_nodes = bpy.data.node_groups.get(f"{slug}_scatter") or bpy.data.node_groups.get(slug)
+            if geo_nodes:
+                col.label(text="Geometry nodes default values:")
+                for key, value in geo_nodes.interface.items_tree.items():
+                    if value.in_out == "INPUT":
+                        if hasattr(value, "default_value"):
+                            col.label(text=f"{key}: {value.default_value}", icon="BLANK1")
+
 
 class HAT_PT_folder_structure(bpy.types.Panel):
     bl_label = "Folder Structure"

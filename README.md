@@ -38,7 +38,7 @@ Checks:
 * [x] All objects have applied scale (1.0) to ensure no unexpected behaviour
 * [x] Objects should be at the origin
 * [x] Objects should not have shape keys which may cause issues for GLTF export
-* [x] Scene unit scale is set to 1.0 meters
+* [x] Scene unit scale is set to 1.0 meters and is Metric
 * [x] Objects should not have vertex colors which may break GLTF export
 
 ### Materials

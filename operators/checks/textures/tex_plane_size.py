@@ -17,9 +17,9 @@ def check(slug):
                 messages.append(f"Expecting object named '{obj_name}'")
         if result == "SUCCESS":
             plane = bpy.data.objects["Plane"]
-            default_dimensions = Vector((2, 2, 0))
+            default_dimensions = Vector((20, 20, 0))
             if plane.dimensions == default_dimensions:
                 result = "QUESTION"
-                messages = ["Plane has default dimensions (2 meters), confirm this is accurate."]
+                messages = ["Plane has default dimensions (20 meters), confirm this is accurate."]
 
     return result, messages

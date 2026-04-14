@@ -10,7 +10,7 @@ def check(slug):
         if mat.use_nodes:
             for node in mat.node_tree.nodes:
                 if node.type == "MATH":
-                    result = "ERROR" if bpy.context.window_manager.hat_props.asset_type == "texture" else "WARNING"
+                    result = "ERROR" if bpy.context.scene.hat_props.asset_type == "texture" else "WARNING"
                     messages.append(f"Material '{mat.name}' contains math node '{node.name}'")
 
     return result, messages

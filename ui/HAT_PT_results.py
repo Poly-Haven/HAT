@@ -12,10 +12,10 @@ class HAT_PT_results(bpy.types.Panel):
 
     @classmethod
     def poll(self, context):
-        return context.window_manager.hat_props.latest_tests != ""
+        return context.scene.hat_props.latest_tests != ""
 
     def draw(self, context):
-        props = context.window_manager.hat_props
+        props = context.scene.hat_props
         col = self.layout.column()
         if props.latest_tests:
             try:

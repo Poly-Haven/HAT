@@ -6,7 +6,7 @@ def check(slug):
     result = "SUCCESS"
     messages = []
 
-    if bpy.context.window_manager.hat_props.asset_type == "texture":
+    if bpy.context.scene.hat_props.asset_type == "texture":
         for obj in bpy.context.scene.objects:
             if obj.type == "MESH":
                 if obj.name not in ["Plane", "Sphere"]:

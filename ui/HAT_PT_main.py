@@ -13,7 +13,7 @@ class HAT_PT_main(bpy.types.Panel):
 
     def draw_header(self, context):
         i = icons.get_icons()
-        props = context.window_manager.hat_props
+        props = context.scene.hat_props
 
         layout = self.layout
         row = layout.row()
@@ -25,7 +25,7 @@ class HAT_PT_main(bpy.types.Panel):
         row.separator()
 
     def draw(self, context):
-        props = context.window_manager.hat_props
+        props = context.scene.hat_props
 
         col = self.layout.column(align=True)
         row = col.row()

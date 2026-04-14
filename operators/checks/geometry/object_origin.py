@@ -14,7 +14,7 @@ def check(slug):
     for obj in bpy.data.objects:
         if obj.type == "MESH":
             if obj.location != zero:
-                result = "WARNING" if bpy.context.window_manager.hat_props.asset_type == "texture" else "QUESTION"
+                result = "WARNING" if bpy.context.scene.hat_props.asset_type == "texture" else "QUESTION"
                 objects.append(obj)
 
     if not objects:

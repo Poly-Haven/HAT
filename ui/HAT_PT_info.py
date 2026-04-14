@@ -12,7 +12,7 @@ class HAT_PT_info(bpy.types.Panel):
 
     def draw(self, context):
         i = icons.get_icons()
-        props = context.window_manager.hat_props
+        props = context.scene.hat_props
         slug = get_slug()
         col = self.layout.column(align=True)
 

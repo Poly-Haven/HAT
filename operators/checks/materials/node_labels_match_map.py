@@ -29,9 +29,7 @@ def check(slug):
                             label_map_name = node.label.lower()
                         log.debug(f"{node.label}\n\tmap_name: {map_name}\n\tlabel_map_name: {label_map_name}")
                         if map_name != label_map_name:
-                            result = (
-                                "ERROR" if bpy.context.window_manager.hat_props.asset_type == "texture" else "WARNING"
-                            )
+                            result = "ERROR" if bpy.context.scene.hat_props.asset_type == "texture" else "WARNING"
                             messages.append(f"{mat.name}'s image label '{node.label}' != map name '{map_name}'")
 
     return result, messages

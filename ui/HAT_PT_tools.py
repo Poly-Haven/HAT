@@ -14,7 +14,7 @@ class HAT_PT_tools(bpy.types.Panel):
     bl_parent_id = "HAT_PT_main"
 
     def draw(self, context):
-        props = context.window_manager.hat_props
+        props = context.scene.hat_props
         col = self.layout.column()
         col.operator(change_slug.HAT_OT_change_slug.bl_idname, icon="OUTLINER_OB_FONT")
 

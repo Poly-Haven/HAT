@@ -189,9 +189,7 @@ class HAT_PT_folder_structure(bpy.types.Panel):
 
         # Flag unknown map types
         if current_folder == "textures":
-            map_name = get_map_name(
-                item_name, slug, strict=bpy.context.window_manager.hat_props.asset_type == "texture"
-            )
+            map_name = get_map_name(item_name, slug, strict=bpy.context.scene.hat_props.asset_type == "texture")
             if map_name not in standard_map_names:
                 return "unknown"
 
@@ -209,7 +207,7 @@ class HAT_PT_folder_structure(bpy.types.Panel):
         return item_name.lower()
 
     def draw(self, context):
-        props = context.window_manager.hat_props
+        props = context.scene.hat_props
         slug = get_slug()
 
         valid_root_common = [

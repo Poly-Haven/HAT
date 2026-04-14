@@ -22,10 +22,11 @@ def draw_message_label(layout, message, status):
 
     fix_buttons = {
         "HDRI or world present.": "HAT_OT_delete_world",
+        "Other asset datablocks found.": "HAT_OT_clear_assets",
     }
 
     if message in fix_buttons:
-        layout = layout.row(align=True)
+        layout = layout.row()
         layout.alignment = "LEFT"
 
     if status in status_icon_custom:

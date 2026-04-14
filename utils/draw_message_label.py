@@ -20,7 +20,18 @@ def draw_message_label(layout, message, status):
         "SUCCESS": "CHECKMARK",
     }
 
+    fix_buttons = {
+        "HDRI or world present.": "HAT_OT_delete_world",
+    }
+
+    if message in fix_buttons:
+        layout = layout.row(align=True)
+        layout.alignment = "LEFT"
+
     if status in status_icon_custom:
         layout.label(text=message, icon_value=i[status_icon_custom[status]].icon_id)
     else:
         layout.label(text=message, icon=status_icon[status])
+
+    if message in fix_buttons:
+        layout.operator(fix_buttons[message], text="Fix")

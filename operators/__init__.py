@@ -1,6 +1,7 @@
 if "bpy" not in locals():
     from . import change_slug
     from . import check
+    from . import delete_world
     from . import export_gltf
     from . import fix_img_db_name
     from . import open_folder
@@ -11,6 +12,7 @@ else:
 
     importlib.reload(change_slug)
     importlib.reload(check)
+    importlib.reload(delete_world)
     importlib.reload(export_gltf)
     importlib.reload(fix_img_db_name)
     importlib.reload(open_folder)
@@ -20,6 +22,7 @@ else:
 classes = [
     change_slug.HAT_OT_change_slug,
     check.HAT_OT_check,
+    delete_world.HAT_OT_delete_world,
     export_gltf.HAT_OT_export_gltf,
     fix_img_db_name.HAT_OT_fix_img_db_name,
     open_folder.HAT_OT_open_folder,

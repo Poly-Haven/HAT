@@ -22,6 +22,7 @@ Checks:
 * [x] Texture datablock names should match their file names
 * [x] Geometry nodes collections are properly structured with LOD0 or static collections
 * [x] LOD (Level of Detail) collections and objects are properly structured
+* [x] No other asset contamination in the file
 * [x] No world or HDRI data blocks should be present in the asset
 * [x] File should contain only one scene and one view layer
 * [x] Texture assets should only have "Plane" and "Sphere" objects
@@ -38,7 +39,7 @@ Checks:
 * [x] All objects have applied scale (1.0) to ensure no unexpected behaviour
 * [x] Objects should be at the origin
 * [x] Objects should not have shape keys which may cause issues for GLTF export
-* [x] Scene unit scale is set to 1.0 meters and is Metric
+* [x] Scene unit scale is set to 1.0 and is Metric
 * [x] Objects should not have vertex colors which may break GLTF export
 
 ### Materials

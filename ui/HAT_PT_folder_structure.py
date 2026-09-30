@@ -1,9 +1,76 @@
 import bpy
 import fnmatch
+import os
+import threading
+import time
+from collections import namedtuple
 from pathlib import Path
 from ..utils.filename_utils import get_slug, remove_num, get_map_name
 from ..utils.standard_map_names import names as standard_map_names
 from .. import icons
+
+# Scanning the folder happens in a background thread so that draw() never touches the (often networked) filesystem.
+# The thread only uses os/pathlib, never bpy. draw() reads the last result and kicks off a rescan when it's stale.
+REFRESH_INTERVAL = 5  # Seconds
+
+Entry = namedtuple("Entry", ["name", "is_dir", "children"])
+
+_cache = {"root": None, "tree": None, "time": 0.0}
+_scan_thread = None
+
+
+def _scan_folder(folder, depth, ignored):
+    """Return a sorted list of Entry for folder (folders first), recursing into non-ignored subfolders"""
+    if depth >= 6:  # Limit recursion depth
+        return None
+    try:
+        with os.scandir(folder) as it:
+            # DirEntry caches file type from the directory listing, so no extra stat per item on Windows
+            listing = [(e.name, e.path, e.is_dir(), e.is_file()) for e in it]
+    except OSError:
+        return None
+
+    folders = sorted((x for x in listing if x[2]), key=lambda x: x[0].lower())
+    files = sorted((x for x in listing if x[3] and not x[2]), key=lambda x: x[0].lower())
+
+    entries = []
+    for name, path, _, _ in folders:
+        ignore = HAT_PT_folder_structure._should_ignore(name, ignored)
+        entries.append(Entry(name, True, None if ignore else _scan_folder(path, depth + 1, ignored)))
+    for name, _, _, _ in files:
+        entries.append(Entry(name, False, None))
+    return entries
+
+
+def _scan_worker(root, ignored):
+    global _cache
+    tree = _scan_folder(root, 0, ignored)
+    _cache = {"root": root, "tree": tree or [], "time": time.monotonic()}  # Swap whole dict so readers never see a mix
+
+
+def _redraw_when_scanned():
+    """Timer callback (main thread): wait for the scan thread, then redraw properties editors"""
+    if _scan_thread is not None and _scan_thread.is_alive():
+        return 0.1
+    for wm in bpy.data.window_managers:
+        for window in wm.windows:
+            for area in window.screen.areas:
+                if area.type == "PROPERTIES":
+                    area.tag_redraw()
+    return None
+
+
+def _request_scan(root, ignored):
+    """Start a background scan if the cached tree is for another folder or is stale"""
+    global _scan_thread
+    if _scan_thread is not None and _scan_thread.is_alive():
+        return
+    cache = _cache
+    if cache["root"] == root and time.monotonic() - cache["time"] < REFRESH_INTERVAL:
+        return
+    _scan_thread = threading.Thread(target=_scan_worker, args=(root, list(ignored)), daemon=True)
+    _scan_thread.start()
+    bpy.app.timers.register(_redraw_when_scanned, first_interval=0.1)
 
 
 class HAT_PT_folder_structure(bpy.types.Panel):
@@ -17,40 +84,15 @@ class HAT_PT_folder_structure(bpy.types.Panel):
     def poll(cls, context):
         return bool(bpy.data.filepath)
 
-    def draw_folder(self, layout, slug, folder_path, depth, required, valid, ignored):
+    def draw_folder(self, layout, slug, all_items, folder_name, depth, required, valid, ignored):
         """
-        Recursively draw folder structure with file/folder validation
+        Recursively draw a scanned folder structure (list of Entry, folders first) with file/folder validation
         """
-        if depth >= 6:  # Limit recursion depth
-            return
-
-        folder_path = Path(folder_path)
-        if folder_path.is_file():
-            folder_path = folder_path.parent
-
-        if not folder_path.exists():
-            return
-
         # Get current folder name for pattern matching
-        current_folder = "/" if depth == 0 else folder_path.name
+        current_folder = "/" if depth == 0 else folder_name
 
         # Get icons
         i = icons.get_icons()
-
-        # Get items in current folder
-        try:
-            items = list(folder_path.iterdir())
-        except (PermissionError, OSError):
-            return
-
-        # Separate files and folders, sort alphabetically (case-insensitive)
-        folders = [item for item in items if item.is_dir()]
-        files = [item for item in items if item.is_file()]
-        folders.sort(key=lambda x: x.name.lower())
-        files.sort(key=lambda x: x.name.lower())
-
-        # Process all items (folders first, then files)
-        all_items = folders + files
 
         # Track which required items we've found
         found_required = set()
@@ -68,7 +110,7 @@ class HAT_PT_folder_structure(bpy.types.Panel):
                 row.label(text="", icon="BLANK1")
 
             # Determine item status
-            is_folder = item.is_dir()
+            is_folder = item.is_dir
             status = self._get_item_status(item_name, current_folder, required, valid, slug, is_folder)
 
             # Track found required items
@@ -86,7 +128,8 @@ class HAT_PT_folder_structure(bpy.types.Panel):
                     row.label(text="", icon_value=i["exclamation-triangle"].icon_id)
 
                 # Recursively draw folder contents
-                self.draw_folder(layout, slug, item, depth + 1, required, valid, ignored)
+                if item.children is not None:
+                    self.draw_folder(layout, slug, item.children, item_name, depth + 1, required, valid, ignored)
             else:
                 file_icon = self._get_file_icon(item_name)
                 row.label(text=item_name, icon=file_icon)
@@ -129,7 +172,7 @@ class HAT_PT_folder_structure(bpy.types.Panel):
         if depth == 0:
             for folder_name in required.keys():
                 if folder_name != "/":  # Skip root folder
-                    folder_exists = any(item.is_dir() and item.name == folder_name for item in all_items)
+                    folder_exists = any(item.is_dir and item.name == folder_name for item in all_items)
                     if not folder_exists:
                         row = layout.row()
                         row.label(text=f"Missing: {folder_name} folder", icon_value=i["exclamation-triangle"].icon_id)
@@ -153,7 +196,8 @@ class HAT_PT_folder_structure(bpy.types.Panel):
         else:
             return "FILE"
 
-    def _should_ignore(self, item_name, ignored_patterns):
+    @staticmethod
+    def _should_ignore(item_name, ignored_patterns):
         """Check if an item should be ignored based on patterns"""
         for pattern in ignored_patterns:
             if fnmatch.fnmatch(item_name.lower(), pattern.lower()):
@@ -295,10 +339,18 @@ class HAT_PT_folder_structure(bpy.types.Panel):
             "Thumbs.db",
         ]
 
+        root = os.path.dirname(bpy.data.filepath)
+        _request_scan(root, ignored)
+        cache = _cache
+        if cache["root"] != root:
+            self.layout.label(text="Scanning...", icon="TIME")
+            return
+
         self.draw_folder(
             self.layout.column(align=True),
             slug,
-            bpy.data.filepath,
+            cache["tree"],
+            "/",
             0,
             required[props.asset_type],
             valid[props.asset_type],

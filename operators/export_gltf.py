@@ -130,29 +130,28 @@ def export_texture(cls, context, slug, gltf_file):
     disp_image = find_disp(D.images)
 
     if disp_image is None:
-        cls.report({"ERROR"}, "Could not find displacement data block")
-        return {"CANCELLED"}
+        log.info("No displacement map found, exporting without displacement")
+    else:
+        disp_texture = D.textures.new("Displacement", "IMAGE")
+        disp_texture.image = disp_image
 
-    disp_texture = D.textures.new("Displacement", "IMAGE")
-    disp_texture.image = disp_image
-
-    # CREATE DISPLACEMENT MODIFIER
-    disp_mod = obj.modifiers.new("DisplacementMod", "DISPLACE")
-    disp_mod.texture = disp_texture
-    disp_mod.texture_coords = "UV"
-    disp_node = None
-    for n in mat.node_tree.nodes:
-        if n.type == "DISPLACEMENT":
-            disp_node = n
-            break
-    if not disp_node:
-        cls.report({"ERROR"}, "No displacement node")
-        return {"CANCELLED"}
-    disp_mod.strength = disp_node.inputs[2].default_value
-    disp_mod.mid_level = disp_node.inputs[1].default_value
-    mapping_node = mat.node_tree.nodes["Mapping"]
-    D.textures["Displacement"].repeat_x = round(mapping_node.inputs[3].default_value[0])
-    D.textures["Displacement"].repeat_y = round(mapping_node.inputs[3].default_value[1])
+        # CREATE DISPLACEMENT MODIFIER
+        disp_mod = obj.modifiers.new("DisplacementMod", "DISPLACE")
+        disp_mod.texture = disp_texture
+        disp_mod.texture_coords = "UV"
+        disp_node = None
+        for n in mat.node_tree.nodes:
+            if n.type == "DISPLACEMENT":
+                disp_node = n
+                break
+        if not disp_node:
+            cls.report({"ERROR"}, "No displacement node")
+            return {"CANCELLED"}
+        disp_mod.strength = disp_node.inputs[2].default_value
+        disp_mod.mid_level = disp_node.inputs[1].default_value
+        mapping_node = mat.node_tree.nodes["Mapping"]
+        disp_texture.repeat_x = round(mapping_node.inputs[3].default_value[0])
+        disp_texture.repeat_y = round(mapping_node.inputs[3].default_value[1])
 
     # CREATE DECIMATE MODIFIER
     decimate_mod = obj.modifiers.new("DecimateMod", "DECIMATE")
